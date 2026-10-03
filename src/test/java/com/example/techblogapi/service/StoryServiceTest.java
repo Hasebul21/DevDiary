@@ -8,10 +8,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import com.example.techblogapi.dto.StoryDtoConverter;
 import com.example.techblogapi.entity.Storys;
+import com.example.techblogapi.entity.Tags;
 import com.example.techblogapi.entity.Users;
 import com.example.techblogapi.exception.AccessDeniedException;
 import com.example.techblogapi.exception.EntityNotFoundException;
 import com.example.techblogapi.repository.StoryRepository;
+import com.example.techblogapi.repository.TagRepository;
 import com.example.techblogapi.repository.UserRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +46,9 @@ public class StoryServiceTest {
 
     @MockBean
     private IsValidStory checkAuth;
+
+    @MockBean
+    private TagRepository tagRepository;
 
 
     @Test
@@ -223,5 +229,37 @@ public class StoryServiceTest {
         when(storyRepository.findAll()).thenReturn(Arrays.asList(mockStory1,mockStory2));
         List<StoryDto>found=storyService.searchStory("");
         Assertions.assertEquals(2,found.size(),"Expected all Story");
+    }
+
+    @Test
+    @DisplayName("Test Post Story With Tags")
+    void postStoryWithTags(){
+
+        Users mockUser=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        Storys mockStory=new Storys(0, mockUser,"Spring boot","Spring boot is hard.Really!!!!");
+        // "Java" and "java " are same tag, empty tag should be skipped
+        mockStory.setTags(new ArrayList<>(Arrays.asList(new Tags("Java"),new Tags("java "),new Tags("spring"),new Tags(" "))));
+        Tags oldTag=new Tags(1,"java");
+        Tags newTag=new Tags(2,"spring");
+        when(checkAuth.getAuthName()).thenReturn("haseb@gmail.com");
+        when(userRepository.findByEmail("haseb@gmail.com")).thenReturn(Optional.of(mockUser));
+        when(tagRepository.findByName("java")).thenReturn(Optional.of(oldTag));
+        when(tagRepository.findByName("spring")).thenReturn(Optional.empty());
+        when(tagRepository.save(any(Tags.class))).thenReturn(newTag);
+        storyService.postStory(mockStory);
+        Assertions.assertEquals(2,mockStory.getTags().size(),"Story should have 2 tag");
+        Assertions.assertSame(oldTag,mockStory.getTags().get(0),"Old tag should be reused");
+        verify(tagRepository,times(1)).save(any(Tags.class));
+    }
+
+    @Test
+    @DisplayName("Test Get Story By Tag")
+    void getStoryByTag(){
+
+        Users mockUser=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        Storys mockStory1=new Storys(1, mockUser,"Spring boot","Spring boot is hard.Really!!!!");
+        when(storyRepository.findByTags_NameOrderByIdDesc("java")).thenReturn(Arrays.asList(mockStory1));
+        List<StoryDto>found=storyService.getStoryByTag(" Java ");
+        Assertions.assertEquals(1,found.size(),"Expected 1 Story");
     }
 }

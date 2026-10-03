@@ -59,6 +59,8 @@ public class SecurityConfiguration {
                 .permitAll()
                 .antMatchers(HttpMethod.GET,apiVersion+"/users/",apiVersion+"/users/*",apiVersion+"/users/*/stories")
                 .permitAll()
+                .antMatchers(HttpMethod.GET,apiVersion+"/tags/",apiVersion+"/tags/*/stories")
+                .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

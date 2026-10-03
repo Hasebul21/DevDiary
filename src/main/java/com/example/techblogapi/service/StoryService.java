@@ -4,10 +4,12 @@ import com.example.techblogapi.Utils.IsValidStory;
 import com.example.techblogapi.dto.StoryDto;
 import com.example.techblogapi.dto.StoryDtoConverter;
 import com.example.techblogapi.entity.Storys;
+import com.example.techblogapi.entity.Tags;
 import com.example.techblogapi.entity.Users;
 import com.example.techblogapi.exception.AccessDeniedException;
 import com.example.techblogapi.exception.EntityNotFoundException;
 import com.example.techblogapi.repository.StoryRepository;
+import com.example.techblogapi.repository.TagRepository;
 import com.example.techblogapi.repository.UserRepository;
 import com.example.techblogapi.dto.StoryPageDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,9 @@ public class StoryService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
 
     @Autowired
     private IsValidStory checkAuth;
@@ -120,6 +125,7 @@ public class StoryService {
         String userEmail= checkAuth.getAuthName();
         Optional<Users> currentUser=userRepository.findByEmail(userEmail);
         story.setAuthorid(currentUser.get());
+        story.setTags(saveTags(story.getTags()));
         storyRepository.save(story);
         return storyDtoConverter.getDetails(story);
     }
@@ -133,6 +139,8 @@ public class StoryService {
             Storys checkStory=newStory.get();
             checkStory.setTitle(story.getTitle());
             checkStory.setDescription(story.getDescription());
+            // only change tags if client sent tags
+            if(story.getTags()!=null) checkStory.setTags(saveTags(story.getTags()));
             storyRepository.save(checkStory);
             return storyDtoConverter.getDetails(checkStory);
         }
@@ -150,5 +158,40 @@ public class StoryService {
             return;
         }
         throw new AccessDeniedException("Unauthorized user");
+    }
+
+    public List<StoryDto> getStoryByTag(String tagName) {
+
+        List<Storys> tagStory=storyRepository.findByTags_NameOrderByIdDesc(tagName.trim().toLowerCase());
+        List<StoryDto> result=new ArrayList<>();
+        for(Storys story : tagStory){
+            result.add(storyDtoConverter.getDetails(story));
+        }
+        return result;
+    }
+
+    // find tag by name, if not found then create a new tag
+    private List<Tags> saveTags(List<Tags> tags) {
+
+        List<Tags> result=new ArrayList<>();
+        if(tags==null) return result;
+
+        List<String> addedNames=new ArrayList<>();
+        for(Tags tag : tags){
+            if(tag==null || tag.getName()==null) continue;
+            String name=tag.getName().trim().toLowerCase();
+            if(name.isEmpty() || addedNames.contains(name)) continue;
+
+            Optional<Tags> oldTag=tagRepository.findByName(name);
+            if(oldTag.isPresent()){
+                result.add(oldTag.get());
+            }
+            else{
+                Tags newTag=new Tags(name);
+                result.add(tagRepository.save(newTag));
+            }
+            addedNames.add(name);
+        }
+        return result;
     }
 }
