@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: techblog-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/v1/stories/page
+    envVars:
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        sync: false

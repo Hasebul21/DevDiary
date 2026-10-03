@@ -18,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
@@ -33,6 +34,9 @@ public class SecurityConfiguration {
     @Value("${v1API}")
     private String apiVersion;
 
+    @Value("${allowedOrigins}")
+    private String allowedOrigins;
+
     @Bean
     public PasswordEncoder passwordEncoder(){
 
@@ -43,7 +47,11 @@ public class SecurityConfiguration {
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
         corsConfiguration.setAllowedHeaders(List.of("Authorization", "Cache-Control", "Content-Type"));
-        corsConfiguration.setAllowedOrigins(List.of("http://localhost:3000"));
+        List<String> origins=new ArrayList<>();
+        for(String origin : allowedOrigins.split(",")){
+            if(!origin.trim().isEmpty()) origins.add(origin.trim());
+        }
+        corsConfiguration.setAllowedOrigins(origins);
         corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PUT","OPTIONS","PATCH", "DELETE"));
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setExposedHeaders(List.of("Authorization"));
