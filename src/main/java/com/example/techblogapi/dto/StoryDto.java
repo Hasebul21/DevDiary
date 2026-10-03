@@ -1,6 +1,8 @@
 package com.example.techblogapi.dto;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class StoryDto {
 
@@ -9,6 +11,7 @@ public class StoryDto {
     private String title;
     private String description;
     private Date CreatedDate;
+    private List<String> tags=new ArrayList<>();
 
     public StoryDto() {
 
@@ -60,6 +63,16 @@ public class StoryDto {
     public void setDescription(String description) {
 
         this.description = description;
+    }
+
+    public List<String> getTags() {
+
+        return tags;
+    }
+
+    public void setTags(List<String> tags) {
+
+        this.tags = tags;
     }
 
     public Date getCreatedDate() {

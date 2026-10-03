@@ -7,7 +7,9 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -30,6 +32,12 @@ public class Storys {
     @NotNull
     @Size(min=0,max = 10000)
     private String description;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "story_tags",
+            joinColumns = @JoinColumn(name = "story_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private List<Tags> tags=new ArrayList<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date CreatedDate=new Date(System.currentTimeMillis());
@@ -88,6 +96,14 @@ public class Storys {
 
         this.authorid = authorid;
     }
+    public List<Tags> getTags() {
+        return tags;
+    }
+
+    public void setTags(List<Tags> tags) {
+        this.tags = tags;
+    }
+
     public Date getCreatedDate() {
         return CreatedDate;
     }

@@ -15,6 +15,9 @@ public interface StoryRepository extends JpaRepository<Storys,Integer> {
     // find all story of a user by user id
     public List<Storys> findByAuthorid_IdOrderByIdDesc(int id);
 
+    // find all story which has this tag
+    public List<Storys> findByTags_NameOrderByIdDesc(String name);
+
     // search story by title or description
     public List<Storys> findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrderByIdDesc(String title, String description);
 
