@@ -2,6 +2,7 @@ package com.example.techblogapi.controller;
 
 
 import com.example.techblogapi.dto.StoryDto;
+import com.example.techblogapi.dto.StoryPageDto;
 import com.example.techblogapi.entity.Storys;
 import com.example.techblogapi.service.StoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,13 @@ public class StoryController {
     @GetMapping("/")
     public ResponseEntity<List<StoryDto>> getAllStory() {
         return ResponseEntity.status(HttpStatus.OK).body(storyService.getAllStory());
+    }
+
+    // stories page by page, example: /stories/page?pageNo=0&pageSize=6
+    @GetMapping("/page")
+    public ResponseEntity<StoryPageDto> getStoryPage(@RequestParam(defaultValue = "0") int pageNo,
+                                                     @RequestParam(defaultValue = "6") int pageSize) {
+        return ResponseEntity.status(HttpStatus.OK).body(storyService.getStoryPage(pageNo,pageSize));
     }
 
     // stories of the logged in user
