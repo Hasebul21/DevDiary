@@ -1,4 +1,4 @@
-# TechBlog-RESTAPI-With-Spring
+# DevDiary
 
 Technology Used:
 ------------------------

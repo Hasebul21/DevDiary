@@ -34,7 +34,7 @@ function App() {
               <Route path="/story/:storyId" element={<Story />} />
             </Routes>
           </Content>
-          <Footer style={{ textAlign: "center" }}>Tech World With Haseb</Footer>
+          <Footer style={{ textAlign: "center" }}>DevDiary - made by Haseb</Footer>
         </Layout>
       </authcontext.Provider>
     </BrowserRouter>

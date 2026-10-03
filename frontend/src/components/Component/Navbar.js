@@ -35,7 +35,7 @@ export default function Navbar() {
 
   return (
     <Header style={{ display: "flex", alignItems: "center" }}>
-      <div className="logo">TECH WORLD WITH HASEB</div>
+      <div className="logo">DevDiary</div>
       {islogged && isAdmin() && <Tag color="red">Admin</Tag>}
       <Menu
         theme="dark"
