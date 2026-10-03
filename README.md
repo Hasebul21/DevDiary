@@ -1,5 +1,7 @@
 # DevDiary
 
+Live: https://devdiary-haseb.vercel.app
+
 Technology Used:
 ------------------------
 • Java
@@ -93,4 +95,6 @@ export JWT_SECRET_KEY=$(openssl rand -base64 32)
 
 # Deploy
 The app has a `Dockerfile` and a `render.yaml`, so it can be deployed on Render as a docker web service.
-Set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` of a hosted MySQL and set `ALLOWED_ORIGINS` to the frontend url.
+Set `DB_URL`, `DB_USERNAME`, `DB_PASSWORD` of a hosted MySQL (for example Aiven free MySQL, `jdbc:mysql://HOST:PORT/defaultdb?sslMode=REQUIRED`), `ADMIN_EMAIL`, `ADMIN_PASSWORD` and set `ALLOWED_ORIGINS` to `https://devdiary-haseb.vercel.app`.
+
+The frontend is in the `frontend` folder and is deployed on Vercel.
