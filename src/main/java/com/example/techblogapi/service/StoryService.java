@@ -8,6 +8,10 @@ import com.example.techblogapi.entity.Tags;
 import com.example.techblogapi.entity.Users;
 import com.example.techblogapi.exception.AccessDeniedException;
 import com.example.techblogapi.exception.EntityNotFoundException;
+import com.example.techblogapi.entity.Comments;
+import com.example.techblogapi.entity.Likes;
+import com.example.techblogapi.repository.CommentRepository;
+import com.example.techblogapi.repository.LikeRepository;
 import com.example.techblogapi.repository.StoryRepository;
 import com.example.techblogapi.repository.TagRepository;
 import com.example.techblogapi.repository.UserRepository;
@@ -35,6 +39,12 @@ public class StoryService {
 
     @Autowired
     private TagRepository tagRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
+
+    @Autowired
+    private LikeRepository likeRepository;
 
     @Autowired
     private IsValidStory checkAuth;
@@ -153,6 +163,12 @@ public class StoryService {
         Optional<Storys> newStory=storyRepository.findById(id);
         if(newStory.isEmpty()) throw new EntityNotFoundException(Storys.class,"id",String.valueOf(id));
         if(checkAuth.isValid(newStory)) {
+
+            // first delete comments and likes of this story, otherwise database will not allow to delete the story
+            List<Comments> comments=commentRepository.findByStory_IdOrderByIdAsc(id);
+            commentRepository.deleteAll(comments);
+            List<Likes> likes=likeRepository.findByStory_Id(id);
+            likeRepository.deleteAll(likes);
 
             storyRepository.deleteById(id);
             return;
