@@ -4,7 +4,7 @@ import axios from "axios";
 import jwt_decode from "jwt-decode";
 import { Card, Form, Input, Button, Popconfirm, Space, Typography, Spin, Select, Tag, message } from "antd";
 import Comments from "./Comments";
-import { BASE_URL, getToken, isAdmin } from "../../api";
+import { BASE_URL, getToken, isAdmin, isGuest } from "../../api";
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -66,6 +66,10 @@ export default function Story() {
     if (user == null) {
       message.info("Please sign in to like a story");
       navigate("/signin");
+      return;
+    }
+    if (isGuest()) {
+      message.info("Guests can only read stories. Sign up to like a story");
       return;
     }
     try {

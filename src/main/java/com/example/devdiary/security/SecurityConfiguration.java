@@ -77,8 +77,10 @@ public class SecurityConfiguration {
                 .permitAll()
                 .antMatchers(HttpMethod.GET, apiVersion + "/tags/", apiVersion + "/tags/*/stories")
                 .permitAll()
-                .anyRequest()
+                .antMatchers(HttpMethod.GET, apiVersion + "/**")
                 .authenticated()
+                .anyRequest()
+                .hasAnyRole("USER", "ADMIN")
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);

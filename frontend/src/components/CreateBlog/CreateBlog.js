@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Card, Form, Input, Button, Select, message } from "antd";
-import { BASE_URL, getToken } from "../../api";
+import { BASE_URL, getToken, isGuest } from "../../api";
 
 function CreateBlog() {
   const navigate = useNavigate();
@@ -11,6 +11,9 @@ function CreateBlog() {
   useEffect(() => {
     if (token == null) {
       navigate("/signin");
+    } else if (isGuest()) {
+      message.info("Guests can only read stories. Sign up to write one");
+      navigate("/");
     }
   }, []);
 
