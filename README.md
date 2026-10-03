@@ -81,7 +81,7 @@ Environment variables:
 | DB_USERNAME | root | |
 | DB_PASSWORD | empty | |
 | ALLOWED_ORIGINS | http://localhost:3000 | frontend urls, comma separated |
-| ADMIN_EMAIL | empty | admin account is created only when email and password are set |
+| ADMIN_EMAIL | hasebulhassan21@gmail.com | admin account is created only when ADMIN_PASSWORD is set |
 | ADMIN_PASSWORD | empty | admin password is reset to this value on every start |
 | ADMIN_NAME | Admin | |
 | SEED_DATA | true | create dummy users, stories, comments and likes when there is no story |
