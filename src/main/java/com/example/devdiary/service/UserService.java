@@ -89,6 +89,9 @@ public class UserService {
         if (!checkAuth.isValid(user)) {
             throw new AccessDeniedException("Unauthorized user");
         }
+        if (AuthService.GUEST_ROLE.equals(user.getRole())) {
+            throw new AccessDeniedException("Guest account can not be changed");
+        }
         return user;
     }
 }

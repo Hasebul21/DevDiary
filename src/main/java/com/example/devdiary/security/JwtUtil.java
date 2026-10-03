@@ -47,12 +47,15 @@ public class JwtUtil implements Serializable {
     }
 
     public String generateToken(UserDetails userDetails) {
-        boolean isAdmin =
+        String role =
                 userDetails.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
-                        .anyMatch("ROLE_ADMIN"::equals);
+                        .filter(authority -> authority.startsWith("ROLE_"))
+                        .map(authority -> authority.substring(5))
+                        .findFirst()
+                        .orElse("USER");
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", isAdmin ? "ADMIN" : "USER");
+        claims.put("role", role);
         return createToken(claims, userDetails.getUsername());
     }
 

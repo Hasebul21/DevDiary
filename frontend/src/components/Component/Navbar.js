@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Layout, Menu, Tag } from "antd";
 import { authcontext } from "./AuthContext";
-import { isAdmin } from "../../api";
+import { isAdmin, isGuest } from "../../api";
 
 const { Header } = Layout;
 
@@ -16,7 +16,9 @@ export default function Navbar() {
   if (islogged) {
     items.push({ key: "/blogs/new", label: "Create Blog" });
     items.push({ key: "/my-stories", label: "My Stories" });
-    items.push({ key: "/user", label: "Update Profile" });
+    if (!isGuest()) {
+      items.push({ key: "/user", label: "Update Profile" });
+    }
     items.push({ key: "logout", label: "Logout" });
   } else {
     items.push({ key: "/signin", label: "Sign In" });
@@ -37,6 +39,7 @@ export default function Navbar() {
     <Header style={{ display: "flex", alignItems: "center" }}>
       <div className="logo">DevDiary</div>
       {islogged && isAdmin() && <Tag color="red">Admin</Tag>}
+      {islogged && isGuest() && <Tag color="blue">Guest</Tag>}
       <Menu
         theme="dark"
         mode="horizontal"
