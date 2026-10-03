@@ -35,6 +35,9 @@ public class AuthService {
 
     public Users signUp(Users user) {
         String email = user.getEmail();
+        if (email != null && GUEST_EMAIL.equalsIgnoreCase(email.trim())) {
+            throw new DuplicateEmailException(email + " already exist");
+        }
         if (userRepository.findByEmail(email).isPresent()) {
             throw new DuplicateEmailException(email + " already exist");
         }
@@ -61,7 +64,11 @@ public class AuthService {
     }
 
     public Users signInAsGuest() {
-        return userRepository.findByEmail(GUEST_EMAIL).orElseGet(this::createGuest);
+        Users guest = userRepository.findByEmail(GUEST_EMAIL).orElseGet(this::createGuest);
+        if (!GUEST_ROLE.equals(guest.getRole())) {
+            throw new AccessDeniedException("Guest account unavailable");
+        }
+        return guest;
     }
 
     private Users createGuest() {
