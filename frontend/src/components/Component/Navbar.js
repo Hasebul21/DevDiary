@@ -1,7 +1,8 @@
 import React, { useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Layout, Menu } from "antd";
+import { Layout, Menu, Tag } from "antd";
 import { authcontext } from "./AuthContext";
+import { isAdmin } from "../../api";
 
 const { Header } = Layout;
 
@@ -35,6 +36,7 @@ export default function Navbar() {
   return (
     <Header style={{ display: "flex", alignItems: "center" }}>
       <div className="logo">TECH WORLD WITH HASEB</div>
+      {islogged && isAdmin() && <Tag color="red">Admin</Tag>}
       <Menu
         theme="dark"
         mode="horizontal"

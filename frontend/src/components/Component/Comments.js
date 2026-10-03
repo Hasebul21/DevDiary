@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Card, List, Form, Input, Button, Popconfirm, Typography, message } from "antd";
-import { BASE_URL, getToken } from "../../api";
+import { BASE_URL, getToken, isAdmin } from "../../api";
 
 const { Text } = Typography;
 
@@ -59,7 +59,7 @@ function Comments(props) {
         renderItem={(comment) => (
           <List.Item
             actions={
-              user === comment.author
+              user === comment.author || isAdmin()
                 ? [
                     <Popconfirm title="Delete this comment?" onConfirm={() => deleteComment(comment.id)} okText="Yes" cancelText="No">
                       <Button type="link" danger size="small">
