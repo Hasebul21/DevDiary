@@ -12,6 +12,7 @@ import com.example.techblogapi.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +47,29 @@ public class StoryService {
         if(checkStory.isEmpty()) throw new EntityNotFoundException(Storys.class,"id",String.valueOf(id));
         return storyDtoConverter.getDetails(checkStory.get());
 
+    }
+
+    public List<StoryDto> getMyStory() {
+
+        String userEmail= checkAuth.getAuthName();
+        List<Storys> myStory=storyRepository.findByAuthorid_EmailOrderByIdDesc(userEmail);
+        List<StoryDto> result=new ArrayList<>();
+        for(Storys story : myStory){
+            result.add(storyDtoConverter.getDetails(story));
+        }
+        return result;
+    }
+
+    public List<StoryDto> getStoryByUser(int userId) {
+
+        Optional<Users> user=userRepository.findById(userId);
+        if(user.isEmpty()) throw new EntityNotFoundException(Users.class,"id",String.valueOf(userId));
+        List<Storys> userStory=storyRepository.findByAuthorid_IdOrderByIdDesc(userId);
+        List<StoryDto> result=new ArrayList<>();
+        for(Storys story : userStory){
+            result.add(storyDtoConverter.getDetails(story));
+        }
+        return result;
     }
 
     public StoryDto postStory(Storys story)  {

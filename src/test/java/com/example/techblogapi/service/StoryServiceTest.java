@@ -147,4 +147,37 @@ public class StoryServiceTest {
         when(checkAuth.isValid(Optional.of(mockStory))).thenReturn(false);
         Assertions.assertThrows(AccessDeniedException.class,()->storyService.deleteStory(1),"This should throw an exception");
     }
+
+    @Test
+    @DisplayName("Test Get My Story")
+    void getMyStory(){
+
+        Users mockUser=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        Storys mockStory1=new Storys(1, mockUser,"Spring boot","Spring boot is hard.Really!!!!");
+        Storys mockStory2=new Storys(2, mockUser,"Java","Java is good");
+        when(checkAuth.getAuthName()).thenReturn("haseb@gmail.com");
+        when(storyRepository.findByAuthorid_EmailOrderByIdDesc("haseb@gmail.com")).thenReturn(Arrays.asList(mockStory1,mockStory2));
+        List<StoryDto>myStory=storyService.getMyStory();
+        Assertions.assertEquals(2,myStory.size(),"Expected 2 Story");
+    }
+
+    @Test
+    @DisplayName("Test Get Story By User Success")
+    void getStoryByUserSuccess(){
+
+        Users mockUser=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        Storys mockStory1=new Storys(1, mockUser,"Spring boot","Spring boot is hard.Really!!!!");
+        when(userRepository.findById(1)).thenReturn(Optional.of(mockUser));
+        when(storyRepository.findByAuthorid_IdOrderByIdDesc(1)).thenReturn(Arrays.asList(mockStory1));
+        List<StoryDto>userStory=storyService.getStoryByUser(1);
+        Assertions.assertEquals(1,userStory.size(),"Expected 1 Story");
+    }
+
+    @Test
+    @DisplayName("Test Get Story By User Failed")
+    void getStoryByUserFailed(){
+
+        when(userRepository.findById(5)).thenReturn(Optional.empty());
+        Assertions.assertThrows(EntityNotFoundException.class,()->storyService.getStoryByUser(5),"This should throw an exception");
+    }
 }
