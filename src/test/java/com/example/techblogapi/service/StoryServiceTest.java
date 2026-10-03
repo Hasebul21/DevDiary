@@ -200,4 +200,28 @@ public class StoryServiceTest {
         Assertions.assertEquals(3,page.getTotalPages(),"Total page should be 3");
         Assertions.assertFalse(page.isLast(),"This is not the last page");
     }
+
+    @Test
+    @DisplayName("Test Search Story")
+    void searchStory(){
+
+        Users mockUser=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        Storys mockStory1=new Storys(1, mockUser,"Spring boot","Spring boot is hard.Really!!!!");
+        when(storyRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrderByIdDesc("spring","spring"))
+                .thenReturn(Arrays.asList(mockStory1));
+        List<StoryDto>found=storyService.searchStory("  spring ");
+        Assertions.assertEquals(1,found.size(),"Expected 1 Story");
+    }
+
+    @Test
+    @DisplayName("Test Search Story With Empty Keyword")
+    void searchStoryEmptyKeyword(){
+
+        Users mockUser=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        Storys mockStory1=new Storys(1, mockUser,"Spring boot","Spring boot is hard.Really!!!!");
+        Storys mockStory2=new Storys(2, mockUser,"Java","Java is good");
+        when(storyRepository.findAll()).thenReturn(Arrays.asList(mockStory1,mockStory2));
+        List<StoryDto>found=storyService.searchStory("");
+        Assertions.assertEquals(2,found.size(),"Expected all Story");
+    }
 }

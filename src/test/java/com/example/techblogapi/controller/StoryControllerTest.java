@@ -234,6 +234,18 @@ public class StoryControllerTest {
                 .andExpect(jsonPath("$.last").value(true));
     }
 
+    @Test
+    @DisplayName("GET/stories/search  Success")
+    void searchStory() throws Exception{
+
+        StoryDto storyDto=new StoryDto(1,"haseb@gmail.com","Spring","Spring boot is a magic");
+        when(mockStoryService.searchStory("spring")).thenReturn(Arrays.asList(storyDto));
+
+        mockMvc.perform(get("/api/v1/stories/search").param("keyword","spring"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Spring"));
+    }
+
     public static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);

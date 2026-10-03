@@ -34,6 +34,12 @@ public class StoryController {
         return ResponseEntity.status(HttpStatus.OK).body(storyService.getStoryPage(pageNo,pageSize));
     }
 
+    // search stories, example: /stories/search?keyword=spring
+    @GetMapping("/search")
+    public ResponseEntity<List<StoryDto>> searchStory(@RequestParam(required = false) String keyword) {
+        return ResponseEntity.status(HttpStatus.OK).body(storyService.searchStory(keyword));
+    }
+
     // stories of the logged in user
     @GetMapping("/my")
     public ResponseEntity<List<StoryDto>> getMyStory() {
