@@ -1,4 +1,4 @@
-# Tech World With Haseb - Frontend
+# DevDiary - Frontend
 
 React + Ant Design frontend of the tech blog. The backend is in the root of this repository.
 

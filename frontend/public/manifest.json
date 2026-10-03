@@ -1,3 +1,9 @@
 {
-        
+  "short_name": "DevDiary",
+  "name": "DevDiary",
+  "icons": [{ "src": "favicon.svg", "type": "image/svg+xml", "sizes": "any" }],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#001529",
+  "background_color": "#f5f5f5"
 }

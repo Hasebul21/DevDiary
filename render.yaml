@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: techblog-api
+    name: devdiary-api
     runtime: docker
     plan: free
     healthCheckPath: /api/v1/stories/page
