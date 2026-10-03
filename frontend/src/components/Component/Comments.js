@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Card, List, Form, Input, Button, Popconfirm, Typography, message } from "antd";
-import { BASE_URL, getToken, isAdmin } from "../../api";
+import { BASE_URL, getToken, isAdmin, isGuest } from "../../api";
 
 const { Text } = Typography;
 
@@ -92,7 +92,11 @@ function Comments(props) {
         )}
       />
 
-      {user ? (
+      {user && isGuest() ? (
+        <Text type="secondary">
+          Guests can only read. <Link to="/signup">Sign up</Link> to write a comment.
+        </Text>
+      ) : user ? (
         <Form form={form} onFinish={addComment} style={{ marginTop: 15 }}>
           <Form.Item
             name="text"

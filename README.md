@@ -23,7 +23,7 @@ Front-end made using ReactJs.
 
 # Features
 - Sign up / Sign in with JWT
-- Sign in as guest (shared demo account, profile can not be changed)
+- Sign in as guest (read-only: can browse stories, comments and likes, can not write anything)
 - Create, update, delete own stories
 - My stories and stories of any user
 - Pagination (newest story first)
