@@ -40,7 +40,7 @@ public class AuthService {
             return userRepository.save(user);
 
         }
-        throw new InvalidPasswordException(user.getPassword());
+        throw new InvalidPasswordException();
 
     }
 
@@ -51,8 +51,7 @@ public class AuthService {
         Optional<Users> newUser=userRepository.findByEmail(userEmail);
         if(newUser.isEmpty()) throw new EntityNotFoundException(Users.class,"Email",userEmail);
         String hashPass=newUser.get().getPassword();
-        if(passwordEncoder.matches(userPassword, hashPass)==false) throw  new AccessDeniedException
-                     (user.getEmail()+" and "+ user.getPassword()+" did not match");
+        if(passwordEncoder.matches(userPassword, hashPass)==false) throw new AccessDeniedException("Invalid email or password");
         return newUser.get();
     }
 }
