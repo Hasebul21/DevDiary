@@ -16,7 +16,6 @@ export default function Story() {
   const [likes, setLikes] = useState({ count: 0, users: [] });
 
   const token = getToken();
-  // email of the logged in user, null if not logged in
   const user = token ? jwt_decode(token).sub : null;
 
   useEffect(() => {
@@ -83,7 +82,6 @@ export default function Story() {
     return <Spin size="large" style={{ display: "block", marginTop: 100 }} />;
   }
 
-  // admin can edit and delete every story
   const isMine = user === story.author || isAdmin();
   const likedByMe = user != null && likes.users.includes(user);
 
@@ -91,7 +89,11 @@ export default function Story() {
     <div>
       <Card className="story-box">
         <Text strong>Author: </Text> {story.author}
-        {user !== story.author && isMine && <Tag color="red" style={{ marginLeft: 10 }}>Editing as admin</Tag>}
+        {user !== story.author && isMine && (
+          <Tag color="red" style={{ marginLeft: 10 }}>
+            Editing as admin
+          </Tag>
+        )}
         <br />
         <Text strong>Created: </Text> {new Date(story.createdDate).toLocaleString()}
         <br />
@@ -103,17 +105,28 @@ export default function Story() {
         >
           {likedByMe ? "♥ Liked" : "♡ Like"} ({likes.count})
         </Button>
-
         {isMine ? (
           <Form form={form} layout="vertical" onFinish={updateHandler} style={{ marginTop: 20 }}>
-            <Form.Item label="Title" name="title" rules={[{ required: true, message: "Title can't be empty" }]}>
+            <Form.Item
+              label="Title"
+              name="title"
+              rules={[{ required: true, message: "Title can't be empty" }]}
+            >
               <Input />
             </Form.Item>
-            <Form.Item label="Description" name="description" rules={[{ required: true, message: "Description can't be empty" }]}>
+            <Form.Item
+              label="Description"
+              name="description"
+              rules={[{ required: true, message: "Description can't be empty" }]}
+            >
               <Input.TextArea rows={8} />
             </Form.Item>
             <Form.Item label="Tags" name="tags">
-              <Select mode="tags" placeholder="Type a tag and press enter, for example java" tokenSeparators={[",", " "]} />
+              <Select
+                mode="tags"
+                placeholder="Type a tag and press enter, for example java"
+                tokenSeparators={[",", " "]}
+              />
             </Form.Item>
             <Space>
               <Button type="primary" htmlType="submit">
@@ -129,7 +142,12 @@ export default function Story() {
             <Title level={3}>{story.title}</Title>
             <Paragraph style={{ whiteSpace: "pre-wrap" }}>{story.description}</Paragraph>
             {story.tags.map((tag) => (
-              <Tag key={tag} color="blue" style={{ cursor: "pointer" }} onClick={() => navigate(`/tag/${tag}`)}>
+              <Tag
+                key={tag}
+                color="blue"
+                style={{ cursor: "pointer" }}
+                onClick={() => navigate(`/tag/${tag}`)}
+              >
                 #{tag}
               </Tag>
             ))}

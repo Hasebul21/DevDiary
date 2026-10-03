@@ -3,6 +3,7 @@ package com.example.devdiary.exception.handler;
 import com.example.devdiary.exception.AccessDeniedException;
 import com.example.devdiary.exception.ErrorBody;
 import com.example.devdiary.exception.RestExceptionHandler;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -13,17 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class AccessDeniedExceptionHandler extends ResponseEntityExceptionHandler implements RestExceptionHandler<AccessDeniedException> {
-
+public class AccessDeniedExceptionHandler extends ResponseEntityExceptionHandler
+        implements RestExceptionHandler<AccessDeniedException> {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Object> handle(AccessDeniedException ex) {
-
-        List<String> Error=new ArrayList<>();
+        List<String> Error = new ArrayList<>();
         Error.add(ex.getMessage());
         ErrorBody errorBody = new ErrorBody();
         errorBody.setMessage(Error);
         errorBody.setStatus(HttpStatus.UNAUTHORIZED);
-        return new ResponseEntity<>(errorBody,HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(errorBody, HttpStatus.UNAUTHORIZED);
     }
 }

@@ -34,10 +34,18 @@ function SignUp() {
         <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter your name" }]}>
           <Input />
         </Form.Item>
-        <Form.Item label="Phone" name="phone" rules={[{ required: true, message: "Please enter your phone number" }]}>
+        <Form.Item
+          label="Phone"
+          name="phone"
+          rules={[{ required: true, message: "Please enter your phone number" }]}
+        >
           <Input />
         </Form.Item>
-        <Form.Item label="Password" name="password" rules={[{ required: true, message: "Please enter a password" }]}>
+        <Form.Item
+          label="Password"
+          name="password"
+          rules={[{ required: true, message: "Please enter a password" }]}
+        >
           <Input.Password />
         </Form.Item>
         <Button type="primary" htmlType="submit" block>

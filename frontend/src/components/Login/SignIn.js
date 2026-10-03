@@ -36,7 +36,11 @@ function SignIn() {
         >
           <Input />
         </Form.Item>
-        <Form.Item label="Password" name="password" rules={[{ required: true, message: "Please enter your password" }]}>
+        <Form.Item
+          label="Password"
+          name="password"
+          rules={[{ required: true, message: "Please enter your password" }]}
+        >
           <Input.Password />
         </Form.Item>
         <Button type="primary" htmlType="submit" block>

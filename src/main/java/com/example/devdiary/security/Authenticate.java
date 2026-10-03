@@ -1,28 +1,23 @@
 package com.example.devdiary.security;
 
 import com.example.devdiary.entity.Users;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
-import java.util.Collection;
 
 @Component
 public class Authenticate {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
+    private final UserDetailsInfo userDetailsInfo;
 
-    @Autowired
-    private UserDetailsInfo userDetailsInfo;
+    public Authenticate(JwtUtil jwtUtil, UserDetailsInfo userDetailsInfo) {
+        this.jwtUtil = jwtUtil;
+        this.userDetailsInfo = userDetailsInfo;
+    }
 
-    public String authenticate(Users users){
-
-
-        final UserDetails userDetails=userDetailsInfo.loadUserByUsername(users.getEmail());
-        final String token= jwtUtil.generateToken(userDetails);
-        return token;
-
+    public String authenticate(Users user) {
+        UserDetails userDetails = userDetailsInfo.loadUserByUsername(user.getEmail());
+        return jwtUtil.generateToken(userDetails);
     }
 }

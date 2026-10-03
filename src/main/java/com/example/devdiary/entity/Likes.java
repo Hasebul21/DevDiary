@@ -2,23 +2,19 @@ package com.example.devdiary.entity;
 
 import javax.persistence.*;
 
-// one user can like one story only one time
 @Entity
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "story_id"}))
 public class Likes {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @ManyToOne
-    private Users user;
+    @ManyToOne private Users user;
 
-    @ManyToOne
-    private Storys story;
+    @ManyToOne private Storys story;
 
-    public Likes() {
-    }
+    public Likes() {}
 
     public Likes(Users user, Storys story) {
         this.user = user;

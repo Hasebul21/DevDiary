@@ -61,7 +61,12 @@ function Comments(props) {
             actions={
               user === comment.author || isAdmin()
                 ? [
-                    <Popconfirm title="Delete this comment?" onConfirm={() => deleteComment(comment.id)} okText="Yes" cancelText="No">
+                    <Popconfirm
+                      title="Delete this comment?"
+                      onConfirm={() => deleteComment(comment.id)}
+                      okText="Yes"
+                      cancelText="No"
+                    >
                       <Button type="link" danger size="small">
                         Delete
                       </Button>
@@ -79,7 +84,9 @@ function Comments(props) {
                   </Text>
                 </span>
               }
-              description={<div style={{ whiteSpace: "pre-wrap", color: "rgba(0,0,0,0.88)" }}>{comment.text}</div>}
+              description={
+                <div style={{ whiteSpace: "pre-wrap", color: "rgba(0,0,0,0.88)" }}>{comment.text}</div>
+              }
             />
           </List.Item>
         )}
@@ -87,7 +94,10 @@ function Comments(props) {
 
       {user ? (
         <Form form={form} onFinish={addComment} style={{ marginTop: 15 }}>
-          <Form.Item name="text" rules={[{ required: true, whitespace: true, message: "Write something first" }]}>
+          <Form.Item
+            name="text"
+            rules={[{ required: true, whitespace: true, message: "Write something first" }]}
+          >
             <Input.TextArea rows={3} maxLength={1000} placeholder="Write a comment..." />
           </Form.Item>
           <Button type="primary" htmlType="submit" loading={sending}>
