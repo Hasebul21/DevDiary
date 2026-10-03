@@ -9,7 +9,12 @@ import com.example.techblogapi.exception.AccessDeniedException;
 import com.example.techblogapi.exception.EntityNotFoundException;
 import com.example.techblogapi.repository.StoryRepository;
 import com.example.techblogapi.repository.UserRepository;
+import com.example.techblogapi.dto.StoryPageDto;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -47,6 +52,30 @@ public class StoryService {
         if(checkStory.isEmpty()) throw new EntityNotFoundException(Storys.class,"id",String.valueOf(id));
         return storyDtoConverter.getDetails(checkStory.get());
 
+    }
+
+    public StoryPageDto getStoryPage(int pageNo, int pageSize) {
+
+        if(pageNo<0) pageNo=0;
+        if(pageSize<1 || pageSize>50) pageSize=6;
+
+        // newest story first
+        Pageable pageable=PageRequest.of(pageNo,pageSize,Sort.by("id").descending());
+        Page<Storys> storyPage=storyRepository.findAll(pageable);
+
+        List<StoryDto> stories=new ArrayList<>();
+        for(Storys story : storyPage.getContent()){
+            stories.add(storyDtoConverter.getDetails(story));
+        }
+
+        StoryPageDto storyPageDto=new StoryPageDto();
+        storyPageDto.setStories(stories);
+        storyPageDto.setPageNo(storyPage.getNumber());
+        storyPageDto.setPageSize(storyPage.getSize());
+        storyPageDto.setTotalElements(storyPage.getTotalElements());
+        storyPageDto.setTotalPages(storyPage.getTotalPages());
+        storyPageDto.setLast(storyPage.isLast());
+        return storyPageDto;
     }
 
     public List<StoryDto> getMyStory() {

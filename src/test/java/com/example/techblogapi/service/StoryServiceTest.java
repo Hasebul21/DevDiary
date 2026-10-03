@@ -2,6 +2,10 @@ package com.example.techblogapi.service;
 
 import com.example.techblogapi.Utils.IsValidStory;
 import com.example.techblogapi.dto.StoryDto;
+import com.example.techblogapi.dto.StoryPageDto;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import com.example.techblogapi.dto.StoryDtoConverter;
 import com.example.techblogapi.entity.Storys;
 import com.example.techblogapi.entity.Users;
@@ -179,5 +183,21 @@ public class StoryServiceTest {
 
         when(userRepository.findById(5)).thenReturn(Optional.empty());
         Assertions.assertThrows(EntityNotFoundException.class,()->storyService.getStoryByUser(5),"This should throw an exception");
+    }
+
+    @Test
+    @DisplayName("Test Get Story Page")
+    void getStoryPage(){
+
+        Users mockUser=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        Storys mockStory1=new Storys(2, mockUser,"Java","Java is good");
+        Storys mockStory2=new Storys(1, mockUser,"Spring boot","Spring boot is hard.Really!!!!");
+        when(storyRepository.findAll(any(Pageable.class)))
+                .thenReturn(new PageImpl<>(Arrays.asList(mockStory1,mockStory2), PageRequest.of(0,2),5));
+        StoryPageDto page=storyService.getStoryPage(0,2);
+        Assertions.assertEquals(2,page.getStories().size(),"Expected 2 Story");
+        Assertions.assertEquals(5,page.getTotalElements(),"Total should be 5");
+        Assertions.assertEquals(3,page.getTotalPages(),"Total page should be 3");
+        Assertions.assertFalse(page.isLast(),"This is not the last page");
     }
 }

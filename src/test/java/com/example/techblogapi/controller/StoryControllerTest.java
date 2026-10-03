@@ -2,6 +2,7 @@ package com.example.techblogapi.controller;
 
 
 import com.example.techblogapi.dto.StoryDto;
+import com.example.techblogapi.dto.StoryPageDto;
 import com.example.techblogapi.dto.UserDto;
 import com.example.techblogapi.entity.Storys;
 import com.example.techblogapi.exception.AccessDeniedException;
@@ -211,6 +212,26 @@ public class StoryControllerTest {
         mockMvc.perform(get("/api/v1/users/{id}/stories",1))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].title").value("Spring"));
+    }
+
+    @Test
+    @DisplayName("GET/stories/page  Success")
+    void getStoryPage() throws Exception{
+
+        StoryPageDto pageDto=new StoryPageDto();
+        pageDto.setStories(Arrays.asList(new StoryDto(1,"haseb@gmail.com","Spring","Spring boot is a magic")));
+        pageDto.setPageNo(0);
+        pageDto.setPageSize(6);
+        pageDto.setTotalElements(1);
+        pageDto.setTotalPages(1);
+        pageDto.setLast(true);
+        when(mockStoryService.getStoryPage(0,6)).thenReturn(pageDto);
+
+        mockMvc.perform(get("/api/v1/stories/page"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.stories[0].title").value("Spring"))
+                .andExpect(jsonPath("$.totalPages").value(1))
+                .andExpect(jsonPath("$.last").value(true));
     }
 
     public static String asJsonString(final Object obj) {
