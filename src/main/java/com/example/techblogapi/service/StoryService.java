@@ -78,6 +78,20 @@ public class StoryService {
         return storyPageDto;
     }
 
+    public List<StoryDto> searchStory(String keyword) {
+
+        // nothing to search, so return everything
+        if(keyword==null || keyword.trim().isEmpty()) return getAllStory();
+
+        keyword=keyword.trim();
+        List<Storys> found=storyRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrderByIdDesc(keyword,keyword);
+        List<StoryDto> result=new ArrayList<>();
+        for(Storys story : found){
+            result.add(storyDtoConverter.getDetails(story));
+        }
+        return result;
+    }
+
     public List<StoryDto> getMyStory() {
 
         String userEmail= checkAuth.getAuthName();
