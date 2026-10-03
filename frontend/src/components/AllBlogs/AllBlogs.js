@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Row, Col, Spin, Empty, Pagination, message } from "antd";
+import { Row, Col, Spin, Empty, Pagination, Input, message } from "antd";
 import Card from "../Component/Card";
 import { BASE_URL } from "../../api";
 
@@ -11,17 +11,26 @@ function Blogs() {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [keyword, setKeyword] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        // backend page number starts from 0
-        const res = await axios.get(BASE_URL + "/stories/page", {
-          params: { pageNo: page - 1, pageSize: PAGE_SIZE },
-        });
-        setStoryList(res.data.stories);
-        setTotal(res.data.totalElements);
+        if (keyword !== "") {
+          // search mode, show all results without pagination
+          const res = await axios.get(BASE_URL + "/stories/search", {
+            params: { keyword: keyword },
+          });
+          setStoryList(res.data);
+        } else {
+          // backend page number starts from 0
+          const res = await axios.get(BASE_URL + "/stories/page", {
+            params: { pageNo: page - 1, pageSize: PAGE_SIZE },
+          });
+          setStoryList(res.data.stories);
+          setTotal(res.data.totalElements);
+        }
       } catch (err) {
         console.log(err);
         message.error("Could not load the stories");
@@ -29,18 +38,20 @@ function Blogs() {
       setLoading(false);
     };
     fetchData();
-  }, [page]);
+  }, [page, keyword]);
 
+  const searchHandler = (value) => {
+    setKeyword(value.trim());
+    setPage(1);
+  };
+
+  let content;
   if (loading) {
-    return <Spin size="large" style={{ display: "block", marginTop: 100 }} />;
-  }
-
-  if (storyList.length === 0) {
-    return <Empty description="No stories yet" />;
-  }
-
-  return (
-    <div>
+    content = <Spin size="large" style={{ display: "block", marginTop: 100 }} />;
+  } else if (storyList.length === 0) {
+    content = <Empty description={keyword !== "" ? "No story found for \"" + keyword + "\"" : "No stories yet"} />;
+  } else {
+    content = (
       <Row gutter={[16, 16]}>
         {storyList.map((story) => (
           <Col xs={24} sm={12} lg={8} key={story.id}>
@@ -48,17 +59,33 @@ function Blogs() {
           </Col>
         ))}
       </Row>
-      <Pagination
-        style={{ marginTop: 30, justifyContent: "center" }}
-        current={page}
-        pageSize={PAGE_SIZE}
-        total={total}
-        onChange={(p) => {
-          setPage(p);
-          window.scrollTo(0, 0);
-        }}
-        showSizeChanger={false}
+    );
+  }
+
+  return (
+    <div>
+      <Input.Search
+        placeholder="Search stories by title or description"
+        allowClear
+        enterButton="Search"
+        size="large"
+        onSearch={searchHandler}
+        style={{ maxWidth: 600, margin: "0 auto 30px", display: "flex" }}
       />
+      {content}
+      {!loading && keyword === "" && total > PAGE_SIZE && (
+        <Pagination
+          style={{ marginTop: 30, justifyContent: "center" }}
+          current={page}
+          pageSize={PAGE_SIZE}
+          total={total}
+          onChange={(p) => {
+            setPage(p);
+            window.scrollTo(0, 0);
+          }}
+          showSizeChanger={false}
+        />
+      )}
     </div>
   );
 }
