@@ -9,8 +9,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 public class Storys {
@@ -37,7 +39,10 @@ public class Storys {
     @JoinTable(name = "story_tags",
             joinColumns = @JoinColumn(name = "story_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private List<Tags> tags=new ArrayList<>();
+    @OrderBy("name")
+    // Set (not List) so that the story_tags table gets a primary key,
+    // some MySQL servers (like Aiven) do not allow tables without primary key
+    private Set<Tags> tags=new LinkedHashSet<>();
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date CreatedDate=new Date(System.currentTimeMillis());
@@ -97,11 +102,12 @@ public class Storys {
         this.authorid = authorid;
     }
     public List<Tags> getTags() {
-        return tags;
+        return new ArrayList<>(tags);
     }
 
     public void setTags(List<Tags> tags) {
-        this.tags = tags;
+        if(tags==null) this.tags=new LinkedHashSet<>();
+        else this.tags=new LinkedHashSet<>(tags);
     }
 
     public Date getCreatedDate() {

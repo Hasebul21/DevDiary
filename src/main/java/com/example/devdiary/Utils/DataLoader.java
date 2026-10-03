@@ -60,6 +60,17 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) {
 
+        // dummy data is not important, so if something goes wrong here the app should still start
+        try{
+            loadData();
+        }
+        catch(Exception e){
+            System.out.println("Could not create dummy data: "+e.getMessage());
+        }
+    }
+
+    private void loadData() {
+
         Users admin=createAdmin();
         if(seedData && storyRepository.count()==0){
             createDummyData(admin);
