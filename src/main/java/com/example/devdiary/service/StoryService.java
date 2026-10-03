@@ -3,215 +3,191 @@ package com.example.devdiary.service;
 import com.example.devdiary.Utils.IsValidStory;
 import com.example.devdiary.dto.StoryDto;
 import com.example.devdiary.dto.StoryDtoConverter;
+import com.example.devdiary.dto.StoryPageDto;
 import com.example.devdiary.entity.Storys;
 import com.example.devdiary.entity.Tags;
 import com.example.devdiary.entity.Users;
 import com.example.devdiary.exception.AccessDeniedException;
 import com.example.devdiary.exception.EntityNotFoundException;
-import com.example.devdiary.entity.Comments;
-import com.example.devdiary.entity.Likes;
 import com.example.devdiary.repository.CommentRepository;
 import com.example.devdiary.repository.LikeRepository;
 import com.example.devdiary.repository.StoryRepository;
 import com.example.devdiary.repository.TagRepository;
 import com.example.devdiary.repository.UserRepository;
-import com.example.devdiary.dto.StoryPageDto;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
 public class StoryService {
 
-    @Autowired
-    private StoryRepository storyRepository;
+    private static final int DEFAULT_PAGE_SIZE = 6;
+    private static final int MAX_PAGE_SIZE = 50;
+    private final StoryRepository storyRepository;
+    private final UserRepository userRepository;
+    private final TagRepository tagRepository;
+    private final CommentRepository commentRepository;
+    private final LikeRepository likeRepository;
+    private final IsValidStory checkAuth;
+    private final StoryDtoConverter storyDtoConverter;
 
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private TagRepository tagRepository;
-
-    @Autowired
-    private CommentRepository commentRepository;
-
-    @Autowired
-    private LikeRepository likeRepository;
-
-    @Autowired
-    private IsValidStory checkAuth;
-
-    @Autowired
-    private StoryDtoConverter storyDtoConverter;
-
-
+    public StoryService(
+            StoryRepository storyRepository,
+            UserRepository userRepository,
+            TagRepository tagRepository,
+            CommentRepository commentRepository,
+            LikeRepository likeRepository,
+            IsValidStory checkAuth,
+            StoryDtoConverter storyDtoConverter) {
+        this.storyRepository = storyRepository;
+        this.userRepository = userRepository;
+        this.tagRepository = tagRepository;
+        this.commentRepository = commentRepository;
+        this.likeRepository = likeRepository;
+        this.checkAuth = checkAuth;
+        this.storyDtoConverter = storyDtoConverter;
+    }
 
     public List<StoryDto> getAllStory() {
-
-        List<Storys>allStudent=storyRepository.findAll();
-        Collections.reverse(allStudent);
-        return allStudent.stream().map(x->storyDtoConverter.getDetails(x)).toList();
+        List<Storys> stories = storyRepository.findAll();
+        Collections.reverse(stories);
+        return toDtos(stories);
     }
 
     public StoryDto getSingleStory(int id) {
-
-        Optional<Storys> checkStory=storyRepository.findById(id);
-        if(checkStory.isEmpty()) throw new EntityNotFoundException(Storys.class,"id",String.valueOf(id));
-        return storyDtoConverter.getDetails(checkStory.get());
-
+        return storyDtoConverter.getDetails(findStory(id));
     }
 
     public StoryPageDto getStoryPage(int pageNo, int pageSize) {
+        int page = Math.max(pageNo, 0);
+        int size = pageSize < 1 || pageSize > MAX_PAGE_SIZE ? DEFAULT_PAGE_SIZE : pageSize;
+        Page<Storys> storyPage =
+                storyRepository.findAll(PageRequest.of(page, size, Sort.by("id").descending()));
 
-        if(pageNo<0) pageNo=0;
-        if(pageSize<1 || pageSize>50) pageSize=6;
-
-        // newest story first
-        Pageable pageable=PageRequest.of(pageNo,pageSize,Sort.by("id").descending());
-        Page<Storys> storyPage=storyRepository.findAll(pageable);
-
-        List<StoryDto> stories=new ArrayList<>();
-        for(Storys story : storyPage.getContent()){
-            stories.add(storyDtoConverter.getDetails(story));
-        }
-
-        StoryPageDto storyPageDto=new StoryPageDto();
-        storyPageDto.setStories(stories);
-        storyPageDto.setPageNo(storyPage.getNumber());
-        storyPageDto.setPageSize(storyPage.getSize());
-        storyPageDto.setTotalElements(storyPage.getTotalElements());
-        storyPageDto.setTotalPages(storyPage.getTotalPages());
-        storyPageDto.setLast(storyPage.isLast());
-        return storyPageDto;
+        StoryPageDto pageDto = new StoryPageDto();
+        pageDto.setStories(toDtos(storyPage.getContent()));
+        pageDto.setPageNo(storyPage.getNumber());
+        pageDto.setPageSize(storyPage.getSize());
+        pageDto.setTotalElements(storyPage.getTotalElements());
+        pageDto.setTotalPages(storyPage.getTotalPages());
+        pageDto.setLast(storyPage.isLast());
+        return pageDto;
     }
 
     public List<StoryDto> searchStory(String keyword) {
-
-        // nothing to search, so return everything
-        if(keyword==null || keyword.trim().isEmpty()) return getAllStory();
-
-        keyword=keyword.trim();
-        List<Storys> found=storyRepository.findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrderByIdDesc(keyword,keyword);
-        List<StoryDto> result=new ArrayList<>();
-        for(Storys story : found){
-            result.add(storyDtoConverter.getDetails(story));
+        if (keyword == null || keyword.isBlank()) {
+            return getAllStory();
         }
-        return result;
+        String term = keyword.trim();
+        return toDtos(
+                storyRepository
+                        .findByTitleContainingIgnoreCaseOrDescriptionContainingIgnoreCaseOrderByIdDesc(
+                                term, term));
     }
 
     public List<StoryDto> getMyStory() {
-
-        String userEmail= checkAuth.getAuthName();
-        List<Storys> myStory=storyRepository.findByAuthorid_EmailOrderByIdDesc(userEmail);
-        List<StoryDto> result=new ArrayList<>();
-        for(Storys story : myStory){
-            result.add(storyDtoConverter.getDetails(story));
-        }
-        return result;
+        return toDtos(storyRepository.findByAuthorid_EmailOrderByIdDesc(checkAuth.getAuthName()));
     }
 
     public List<StoryDto> getStoryByUser(int userId) {
-
-        Optional<Users> user=userRepository.findById(userId);
-        if(user.isEmpty()) throw new EntityNotFoundException(Users.class,"id",String.valueOf(userId));
-        List<Storys> userStory=storyRepository.findByAuthorid_IdOrderByIdDesc(userId);
-        List<StoryDto> result=new ArrayList<>();
-        for(Storys story : userStory){
-            result.add(storyDtoConverter.getDetails(story));
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new EntityNotFoundException(Users.class, "id", String.valueOf(userId));
         }
-        return result;
+        return toDtos(storyRepository.findByAuthorid_IdOrderByIdDesc(userId));
     }
 
-    public StoryDto postStory(Storys story)  {
+    public List<StoryDto> getStoryByTag(String tagName) {
+        return toDtos(storyRepository.findByTags_NameOrderByIdDesc(tagName.trim().toLowerCase()));
+    }
 
-        String userEmail= checkAuth.getAuthName();
-        Optional<Users> currentUser=userRepository.findByEmail(userEmail);
-        story.setAuthorid(currentUser.get());
-        // id 0 means new story, otherwise save() will overwrite the story with that id
+    public StoryDto postStory(Storys story) {
+        String email = checkAuth.getAuthName();
+        Users author =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () -> new EntityNotFoundException(Users.class, "email", email));
+
         story.setId(0);
+        story.setAuthorid(author);
         story.setCreatedDate(new Date());
-        story.setTags(saveTags(story.getTags()));
+        story.setTags(resolveTags(story.getTags()));
         storyRepository.save(story);
         return storyDtoConverter.getDetails(story);
     }
 
     public StoryDto updateStory(int id, Storys story) {
-
-        Optional<Storys> newStory=storyRepository.findById(id);
-        if(newStory.isEmpty())  throw new EntityNotFoundException(Storys.class,"id",String.valueOf(id));
-        if(checkAuth.isValid(newStory) || checkAuth.isAdmin()){
-
-            Storys checkStory=newStory.get();
-            checkStory.setTitle(story.getTitle());
-            checkStory.setDescription(story.getDescription());
-            // only change tags if client sent tags
-            if(story.getTags()!=null) checkStory.setTags(saveTags(story.getTags()));
-            storyRepository.save(checkStory);
-            return storyDtoConverter.getDetails(checkStory);
+        Storys existing = findEditableStory(id);
+        existing.setTitle(story.getTitle());
+        existing.setDescription(story.getDescription());
+        if (story.getTags() != null) {
+            existing.setTags(resolveTags(story.getTags()));
         }
-        throw new AccessDeniedException("Unauthorized user");
-
+        storyRepository.save(existing);
+        return storyDtoConverter.getDetails(existing);
     }
 
     public void deleteStory(int id) {
-
-        Optional<Storys> newStory=storyRepository.findById(id);
-        if(newStory.isEmpty()) throw new EntityNotFoundException(Storys.class,"id",String.valueOf(id));
-        if(checkAuth.isValid(newStory) || checkAuth.isAdmin()) {
-
-            // first delete comments and likes of this story, otherwise database will not allow to delete the story
-            List<Comments> comments=commentRepository.findByStory_IdOrderByIdAsc(id);
-            commentRepository.deleteAll(comments);
-            List<Likes> likes=likeRepository.findByStory_Id(id);
-            likeRepository.deleteAll(likes);
-
-            storyRepository.deleteById(id);
-            return;
-        }
-        throw new AccessDeniedException("Unauthorized user");
+        findEditableStory(id);
+        commentRepository.deleteAll(commentRepository.findByStory_IdOrderByIdAsc(id));
+        likeRepository.deleteAll(likeRepository.findByStory_Id(id));
+        storyRepository.deleteById(id);
     }
 
-    public List<StoryDto> getStoryByTag(String tagName) {
-
-        List<Storys> tagStory=storyRepository.findByTags_NameOrderByIdDesc(tagName.trim().toLowerCase());
-        List<StoryDto> result=new ArrayList<>();
-        for(Storys story : tagStory){
-            result.add(storyDtoConverter.getDetails(story));
-        }
-        return result;
+    private Storys findStory(int id) {
+        return storyRepository
+                .findById(id)
+                .orElseThrow(
+                        () -> new EntityNotFoundException(Storys.class, "id", String.valueOf(id)));
     }
 
-    // find tag by name, if not found then create a new tag
-    private List<Tags> saveTags(List<Tags> tags) {
-
-        List<Tags> result=new ArrayList<>();
-        if(tags==null) return result;
-
-        List<String> addedNames=new ArrayList<>();
-        for(Tags tag : tags){
-            if(tag==null || tag.getName()==null) continue;
-            String name=tag.getName().trim().toLowerCase();
-            if(name.isEmpty() || addedNames.contains(name)) continue;
-
-            Optional<Tags> oldTag=tagRepository.findByName(name);
-            if(oldTag.isPresent()){
-                result.add(oldTag.get());
-            }
-            else{
-                Tags newTag=new Tags(name);
-                result.add(tagRepository.save(newTag));
-            }
-            addedNames.add(name);
+    private Storys findEditableStory(int id) {
+        Optional<Storys> story = storyRepository.findById(id);
+        if (story.isEmpty()) {
+            throw new EntityNotFoundException(Storys.class, "id", String.valueOf(id));
         }
-        return result;
+        if (!checkAuth.isValid(story) && !checkAuth.isAdmin()) {
+            throw new AccessDeniedException("Unauthorized user");
+        }
+        return story.get();
+    }
+
+    private List<Tags> resolveTags(List<Tags> tags) {
+        if (tags == null) {
+            return List.of();
+        }
+        Map<String, Tags> resolved = new LinkedHashMap<>();
+        tags.stream()
+                .filter(Objects::nonNull)
+                .map(Tags::getName)
+                .filter(Objects::nonNull)
+                .map(name -> name.trim().toLowerCase())
+                .filter(name -> !name.isEmpty())
+                .forEach(
+                        name ->
+                                resolved.computeIfAbsent(
+                                        name,
+                                        n ->
+                                                tagRepository
+                                                        .findByName(n)
+                                                        .orElseGet(
+                                                                () ->
+                                                                        tagRepository.save(
+                                                                                new Tags(n)))));
+        return List.copyOf(resolved.values());
+    }
+
+    private List<StoryDto> toDtos(List<Storys> stories) {
+        return stories.stream().map(storyDtoConverter::getDetails).toList();
     }
 }

@@ -32,11 +32,19 @@ function CreateBlog() {
         <Form.Item label="Title" name="title" rules={[{ required: true, message: "Please enter a title" }]}>
           <Input />
         </Form.Item>
-        <Form.Item label="Description" name="description" rules={[{ required: true, message: "Please write something" }]}>
+        <Form.Item
+          label="Description"
+          name="description"
+          rules={[{ required: true, message: "Please write something" }]}
+        >
           <Input.TextArea rows={8} />
         </Form.Item>
         <Form.Item label="Tags" name="tags">
-          <Select mode="tags" placeholder="Type a tag and press enter, for example java" tokenSeparators={[",", " "]} />
+          <Select
+            mode="tags"
+            placeholder="Type a tag and press enter, for example java"
+            tokenSeparators={[",", " "]}
+          />
         </Form.Item>
         <Button type="primary" htmlType="submit">
           Save

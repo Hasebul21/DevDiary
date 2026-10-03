@@ -7,55 +7,50 @@ import com.example.devdiary.exception.DuplicateEmailException;
 import com.example.devdiary.exception.EntityNotFoundException;
 import com.example.devdiary.exception.InvalidPasswordException;
 import com.example.devdiary.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-
-
-import java.util.Optional;
-
 
 @Service
 public class AuthService {
 
-    @Autowired
-    private PasswordValidator passwordValidator;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private UserRepository userRepository;
-    public Users signUp(Users user)  {
+    private final PasswordValidator passwordValidator;
+    private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
 
-        String email=user.getEmail();
-        Optional<Users>existUser=userRepository.findByEmail(email);
-        if(existUser.isPresent()) throw new DuplicateEmailException(email+" already exist");
-
-        if(passwordValidator.isValid(user.getPassword())) {
-
-            String pass=passwordEncoder.encode(user.getPassword());
-            user.setPassword(pass);
-            // nobody can become admin from signup
-            user.setRole("USER");
-            // id 0 means new user, otherwise save() will overwrite the user with that id
-            user.setId(0);
-            return userRepository.save(user);
-
-        }
-        throw new InvalidPasswordException();
-
+    public AuthService(
+            PasswordValidator passwordValidator,
+            PasswordEncoder passwordEncoder,
+            UserRepository userRepository) {
+        this.passwordValidator = passwordValidator;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
     }
 
-    public Users signIn(Users user)   {
+    public Users signUp(Users user) {
+        String email = user.getEmail();
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new DuplicateEmailException(email + " already exist");
+        }
+        if (!passwordValidator.isValid(user.getPassword())) {
+            throw new InvalidPasswordException();
+        }
+        user.setId(0);
+        user.setRole("USER");
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepository.save(user);
+    }
 
-        String userEmail= user.getEmail();
-        String userPassword= user.getPassword();
-        Optional<Users> newUser=userRepository.findByEmail(userEmail);
-        if(newUser.isEmpty()) throw new EntityNotFoundException(Users.class,"Email",userEmail);
-        String hashPass=newUser.get().getPassword();
-        if(passwordEncoder.matches(userPassword, hashPass)==false) throw new AccessDeniedException("Invalid email or password");
-        return newUser.get();
+    public Users signIn(Users user) {
+        String email = user.getEmail();
+        Users existing =
+                userRepository
+                        .findByEmail(email)
+                        .orElseThrow(
+                                () -> new EntityNotFoundException(Users.class, "Email", email));
+        if (!passwordEncoder.matches(user.getPassword(), existing.getPassword())) {
+            throw new AccessDeniedException("Invalid email or password");
+        }
+        return existing;
     }
 }

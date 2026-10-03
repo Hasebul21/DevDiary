@@ -1,15 +1,16 @@
 package com.example.devdiary.entity;
 
+import java.util.Date;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.Date;
 
 @Entity
 public class Comments {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @NotBlank(message = "Comment can not be empty")
@@ -17,17 +18,14 @@ public class Comments {
     @Column(length = 1000)
     private String text;
 
-    @ManyToOne
-    private Users user;
+    @ManyToOne private Users user;
 
-    @ManyToOne
-    private Storys story;
+    @ManyToOne private Storys story;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date CreatedDate=new Date(System.currentTimeMillis());
+    private Date CreatedDate = new Date(System.currentTimeMillis());
 
-    public Comments() {
-    }
+    public Comments() {}
 
     public Comments(String text) {
         this.text = text;

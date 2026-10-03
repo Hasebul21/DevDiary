@@ -3,11 +3,11 @@ package com.example.devdiary.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -22,12 +22,10 @@ public class JwtUtil implements Serializable {
     private String SECRET_KEY;
 
     public String extractUsername(String token) {
-
         return extractClaim(token, Claims::getSubject);
     }
 
     public Date extractExpiration(String token) {
-
         return extractClaim(token, Claims::getExpiration);
     }
 
@@ -35,32 +33,37 @@ public class JwtUtil implements Serializable {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-    private Claims extractAllClaims(String token) {
 
-        return Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parseClaimsJws(token).getBody();
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(SECRET_KEY)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     public Boolean isTokenExpired(String token) {
-
         return extractExpiration(token).before(new Date());
     }
 
     public String generateToken(UserDetails userDetails) {
+        boolean isAdmin =
+                userDetails.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .anyMatch("ROLE_ADMIN"::equals);
         Map<String, Object> claims = new HashMap<>();
-        // put role inside token so that frontend can know who is admin
-        String role="USER";
-        for(GrantedAuthority authority : userDetails.getAuthorities()){
-            if(authority.getAuthority().equals("ROLE_ADMIN")) role="ADMIN";
-        }
-        claims.put("role", role);
+        claims.put("role", isAdmin ? "ADMIN" : "USER");
         return createToken(claims, userDetails.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
-
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {

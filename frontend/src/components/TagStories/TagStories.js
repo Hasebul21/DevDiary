@@ -35,7 +35,10 @@ function TagStories() {
   return (
     <div>
       <Title level={3}>
-        Stories tagged <Tag color="blue" style={{ fontSize: 18, padding: "4px 10px" }}>#{name}</Tag>
+        Stories tagged{" "}
+        <Tag color="blue" style={{ fontSize: 18, padding: "4px 10px" }}>
+          #{name}
+        </Tag>
       </Title>
       <Button style={{ marginBottom: 20 }} onClick={() => navigate("/")}>
         Back to all stories

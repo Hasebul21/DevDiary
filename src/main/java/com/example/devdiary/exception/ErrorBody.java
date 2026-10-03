@@ -10,12 +10,10 @@ public class ErrorBody {
 
     private HttpStatus status;
 
-    private List<String> message= new ArrayList<String>();
+    private List<String> message = new ArrayList<String>();
     private LocalDateTime timestamp;
 
-
     public ErrorBody() {
-
         timestamp = LocalDateTime.now();
     }
 

@@ -16,7 +16,6 @@ function Blogs() {
   const [tags, setTags] = useState([]);
   const navigate = useNavigate();
 
-  // load all tags one time
   useEffect(() => {
     axios
       .get(BASE_URL + "/tags/")
@@ -29,13 +28,11 @@ function Blogs() {
       setLoading(true);
       try {
         if (keyword !== "") {
-          // search mode, show all results without pagination
           const res = await axios.get(BASE_URL + "/stories/search", {
             params: { keyword: keyword },
           });
           setStoryList(res.data);
         } else {
-          // backend page number starts from 0
           const res = await axios.get(BASE_URL + "/stories/page", {
             params: { pageNo: page - 1, pageSize: PAGE_SIZE },
           });
@@ -60,7 +57,9 @@ function Blogs() {
   if (loading) {
     content = <Spin size="large" style={{ display: "block", marginTop: 100 }} />;
   } else if (storyList.length === 0) {
-    content = <Empty description={keyword !== "" ? "No story found for \"" + keyword + "\"" : "No stories yet"} />;
+    content = (
+      <Empty description={keyword !== "" ? 'No story found for "' + keyword + '"' : "No stories yet"} />
+    );
   } else {
     content = (
       <Row gutter={[16, 16]}>
@@ -86,7 +85,12 @@ function Blogs() {
       {tags.length > 0 && (
         <div style={{ textAlign: "center", marginBottom: 25 }}>
           {tags.map((tag) => (
-            <Tag key={tag} color="blue" style={{ cursor: "pointer", marginBottom: 8 }} onClick={() => navigate(`/tag/${tag}`)}>
+            <Tag
+              key={tag}
+              color="blue"
+              style={{ cursor: "pointer", marginBottom: 8 }}
+              onClick={() => navigate(`/tag/${tag}`)}
+            >
               #{tag}
             </Tag>
           ))}

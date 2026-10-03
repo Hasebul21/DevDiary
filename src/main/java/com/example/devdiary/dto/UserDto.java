@@ -8,8 +8,7 @@ public class UserDto {
     private String phone;
     private String role;
 
-    public UserDto() {
-    }
+    public UserDto() {}
 
     public UserDto(int id, String email, String name, String phone) {
         this.id = id;
@@ -51,12 +50,10 @@ public class UserDto {
     }
 
     public String getRole() {
-
         return role;
     }
 
     public void setRole(String role) {
-
         this.role = role;
     }
 }
