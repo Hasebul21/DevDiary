@@ -73,9 +73,9 @@ public class CommentService {
         Optional<Comments> comment=commentRepository.findById(commentId);
         if(comment.isEmpty()) throw new EntityNotFoundException(Comments.class,"id",String.valueOf(commentId));
 
-        // only the person who wrote the comment can delete it
+        // only the person who wrote the comment or admin can delete it
         String userEmail=checkAuth.getAuthName();
-        if(!comment.get().getUser().getEmail().equals(userEmail)) throw new AccessDeniedException("Unauthorized user");
+        if(!comment.get().getUser().getEmail().equals(userEmail) && !checkAuth.isAdmin()) throw new AccessDeniedException("Unauthorized user");
 
         commentRepository.deleteById(commentId);
     }

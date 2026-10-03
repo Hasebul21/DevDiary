@@ -108,4 +108,18 @@ public class CommentServiceTest {
         commentService.deleteComment(1);
         verify(commentRepository,times(1)).deleteById(1);
     }
+
+    @Test
+    @DisplayName("Test Admin Can Delete Other User Comment")
+    void adminCanDeleteComment(){
+
+        Users mockUser=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        Storys mockStory=new Storys(1, mockUser,"Spring boot","Spring boot is hard.Really!!!!");
+        Comments comment=new Comments(1,"Nice post",mockUser,mockStory);
+        when(commentRepository.findById(1)).thenReturn(Optional.of(comment));
+        when(checkAuth.getAuthName()).thenReturn("admin@gmail.com");
+        when(checkAuth.isAdmin()).thenReturn(true);
+        commentService.deleteComment(1);
+        verify(commentRepository,times(1)).deleteById(1);
+    }
 }

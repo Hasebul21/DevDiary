@@ -38,6 +38,9 @@ public class Users {
     @Pattern(regexp = "[0-9]{11}" ,message = "Invalid Phone. Number must have exactly 11 digit")
     private String phone;
 
+    // USER or ADMIN
+    private String role="USER";
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date CreatedDate=new Date(System.currentTimeMillis());
 
@@ -51,6 +54,16 @@ public class Users {
         this.password = password;
         this.name = name;
         this.phone = phone;
+    }
+
+    public String getRole() {
+
+        return role;
+    }
+
+    public void setRole(String role) {
+
+        this.role = role;
     }
 
     public void setId(int id) {

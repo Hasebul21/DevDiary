@@ -37,6 +37,8 @@ public class AuthService {
 
             String pass=passwordEncoder.encode(user.getPassword());
             user.setPassword(pass);
+            // nobody can become admin from signup
+            user.setRole("USER");
             return userRepository.save(user);
 
         }
