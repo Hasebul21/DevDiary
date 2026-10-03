@@ -14,6 +14,7 @@ export default function Navbar() {
 
   if (islogged) {
     items.push({ key: "/blogs/new", label: "Create Blog" });
+    items.push({ key: "/my-stories", label: "My Stories" });
     items.push({ key: "/user", label: "Update Profile" });
     items.push({ key: "logout", label: "Logout" });
   } else {
