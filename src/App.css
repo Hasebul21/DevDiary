@@ -1,0 +1,26 @@
+body {
+  margin: 0;
+  background: #f5f5f5;
+}
+
+.logo {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  margin-right: 30px;
+  white-space: nowrap;
+}
+
+.page {
+  padding: 30px 50px;
+}
+
+.form-box {
+  max-width: 420px;
+  margin: 40px auto;
+}
+
+.story-box {
+  max-width: 800px;
+  margin: 0 auto;
+}

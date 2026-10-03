@@ -1,115 +1,99 @@
-import { useEffect, useState,useContext } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import './SingleStory.css';
-import { authcontext } from "./AuthContext";
-import jwt_decode from "jwt-decode";
-import React, { Component }  from 'react';
 import axios from "axios";
+import jwt_decode from "jwt-decode";
+import { Card, Form, Input, Button, Popconfirm, Space, Typography, Spin, message } from "antd";
+import { BASE_URL, getToken } from "../../api";
+
+const { Text } = Typography;
 
 export default function Story() {
   const { storyId } = useParams();
-  //const[id, setId]=useState("");
-  const[title, setTitle]=useState("");
-  const[description, setDescription]=useState("");
-  const [author, setAuthor] = useState("");
-  const [createdDate, setCreatedDate] = useState("");
-  const[validAuthor,setValidAuth]=useState(null);
-  const[jwtToken,setJwtToken]=useState(null);
   const navigate = useNavigate();
+  const [form] = Form.useForm();
+  const [story, setStory] = useState(null);
+  const [user, setUser] = useState(null);
 
-  //const { token } = useContext(authcontext);
-  //const[date, setCreatedate]=useState("");
+  const token = getToken();
 
   useEffect(() => {
-
-    const jwtToken =localStorage.getItem('token')||null;
-    console.log(jwtToken);
-    //if(jwtToken==null) navigate("/");
-    console.log("Cool "+ jwtToken);
-
-    if(jwtToken!=null){
-
-       const user=jwt_decode(jwtToken);
-       console.log(user.sub);
-       setValidAuth(user.sub);
-       setJwtToken(jwtToken);
-
-    }else {
-
-      navigate("/");
-
+    if (token == null) {
+      navigate("/signin");
+      return;
     }
+    setUser(jwt_decode(token).sub);
 
     const fetchData = async () => {
-      const res = await axios.get(`http://localhost:8080/api/v1/stories/`+storyId);
-      const story = res.data;
-      console.log(story);
-      //setId(story.id);
-      setTitle(story.title);
-      setDescription(story.description);
-      setAuthor(story.author);
-      setCreatedDate(story.createdDate);
+      try {
+        const res = await axios.get(BASE_URL + "/stories/" + storyId);
+        setStory(res.data);
+        form.setFieldsValue({
+          title: res.data.title,
+          description: res.data.description,
+        });
+      } catch (err) {
+        message.error("Story not found");
+        navigate("/");
+      }
     };
     fetchData();
   }, [storyId]);
 
-  //console.log("Title : "+title);
-  const updateHandler = async (e) => {
-    e.preventDefault();
-    await axios({
-      method: "put",
-      url: "http://localhost:8080/api/v1/stories/"+storyId,
-      data: {
-        title: title,
-        description: description,
-      },
-      headers : { Authorization: `Bearer ${jwtToken}` },
-    })
-    .then((response) => {
-      alert("Sucessfully Updated");
+  const updateHandler = async (values) => {
+    try {
+      await axios.put(BASE_URL + "/stories/" + storyId, values, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      message.success("Successfully updated");
       navigate("/");
-    })
-    .catch((err) => {
-        alert(err.response.data.message);
-    });
+    } catch (err) {
+      message.error(err.response ? err.response.data.message : "Something went wrong");
+    }
   };
 
-  const deleteHandler= async (e) => {
-  e.preventDefault();
-  await axios({
-      method: "delete",
-      url: "http://localhost:8080/api/v1/stories/"+storyId,
-      headers : { Authorization: `Bearer ${jwtToken}` },
-  })
-  .then((response) => {
-    alert("Sucessfully Deleted");
-    navigate("/");
-  })
-  .catch((err) => {
-        alert(err.response.data.message);
-  });
+  const deleteHandler = async () => {
+    try {
+      await axios.delete(BASE_URL + "/stories/" + storyId, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      message.success("Successfully deleted");
+      navigate("/");
+    } catch (err) {
+      message.error(err.response ? err.response.data.message : "Something went wrong");
+    }
   };
+
+  if (story == null) {
+    return <Spin size="large" style={{ display: "block", marginTop: 100 }} />;
+  }
+
+  const isMine = user === story.author;
 
   return (
-    <div className="story-container">
-      <label id="auth-lab">Author : {author}</label>
-      <label id="date-lab">CreatedDate: {createdDate}</label>
-      <br/>
-      <label id="title-lab">Title</label>
-      <textarea disabled={author!=validAuthor} type="text" rows="2" id="title-box" value={title}  onChange={(e) => setTitle(e.target.value)}></textarea>
+    <Card className="story-box">
+      <Text strong>Author: </Text> {story.author}
       <br />
-      <label id="des-lab">Description</label>
-      <br />
-      <textarea disabled={author!=validAuthor} type="text" rows="4" id="des-box" value={description} onChange={(e) => setDescription(e.target.value)} ></textarea>
-      { (validAuthor==author)
-         &&
-        (<button id="button-sav" value="submit" onClick={updateHandler}>Save</button>)
-      }
-      {
-         (validAuthor==author)
-          &&
-         (<button id="button-del" value="submit" onClick={deleteHandler}>Delete</button>)
-      }
-    </div>
+      <Text strong>Created: </Text> {story.createdDate}
+
+      <Form form={form} layout="vertical" onFinish={updateHandler} disabled={!isMine} style={{ marginTop: 20 }}>
+        <Form.Item label="Title" name="title" rules={[{ required: true, message: "Title can't be empty" }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item label="Description" name="description" rules={[{ required: true, message: "Description can't be empty" }]}>
+          <Input.TextArea rows={8} />
+        </Form.Item>
+
+        {isMine && (
+          <Space>
+            <Button type="primary" htmlType="submit">
+              Save
+            </Button>
+            <Popconfirm title="Delete this story?" onConfirm={deleteHandler} okText="Yes" cancelText="No">
+              <Button danger>Delete</Button>
+            </Popconfirm>
+          </Space>
+        )}
+      </Form>
+    </Card>
   );
 }

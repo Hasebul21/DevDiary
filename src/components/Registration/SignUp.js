@@ -1,92 +1,53 @@
-import { useState, useContext } from "react";
-import "./SignUp.css";
-import { authcontext } from "../Component/AuthContext"; 
-import { useNavigate } from "react-router-dom";
-import React, { Component }  from 'react';
+import React, { useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import { Card, Form, Input, Button, message } from "antd";
+import { authcontext } from "../Component/AuthContext";
+import { BASE_URL } from "../../api";
 
 function SignUp() {
-  const [email, setEmail] = useState("");
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [password, setPassword] = useState("");
   const { setLogStatus } = useContext(authcontext);
   const navigate = useNavigate();
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    await axios({
-      method: "post",
-      url: "http://localhost:8080/api/v1/signup",
-      data: {
-        email: email,
-        password: password,
-        name: name,
-        phone: phone,
-      },
-    })
-    .then((response) => {
-      alert("Sucessfully Registerd");
-      const token = response.data;
-      localStorage.setItem('token', token);
-      console.log(token);
+  const submitHandler = async (values) => {
+    try {
+      const res = await axios.post(BASE_URL + "/signup", values);
+      message.success("Successfully registered");
+      localStorage.setItem("token", res.data);
       setLogStatus(true);
       navigate("/");
-    })
-    .catch((err) => {
-        alert(err.response.data.message);
-    });
-    console.log(email + " " + name + " " + phone + " " + password);
-  }; 
+    } catch (err) {
+      message.error(err.response ? err.response.data.message : "Registration failed");
+    }
+  };
+
   return (
-    <div className="login_box">
-      <form id="form" onSubmit={submitHandler}>
-        <h2 id="heading1">Be a member and share your experience</h2>
-        <h3 id="heading2">Registration</h3>
-        <input
-          id="email"
-          type="text"
+    <Card title="Be a member and share your experience" className="form-box">
+      <Form layout="vertical" onFinish={submitHandler}>
+        <Form.Item
+          label="Email"
           name="email"
-          placeholder="Enter your email"
-          value={email}
-          required
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <br />
-        <input
-          id="name"
-          type="text"
-          name="name"
-          placeholder="Enter Your Name"
-          value={name}
-          required
-          onChange={(e) => setName(e.target.value)}
-        />
-        <br />
-        <input
-          id="phone"
-          type="number"
-          name="phone"
-          placeholder="Enter Your Phone"
-          value={phone}
-          required
-          onChange={(e) => setPhone(e.target.value)}
-        />
-        <br />
-        <input
-          id="password"
-          type="password"
-          name="password"
-          placeholder="Enter Your Password"
-          value={password}
-          required
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button id="button" value="submit">
-          submit
-        </button>
-      </form>
-    </div>
+          rules={[{ required: true, type: "email", message: "Please enter a valid email" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please enter your name" }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item label="Phone" name="phone" rules={[{ required: true, message: "Please enter your phone number" }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item label="Password" name="password" rules={[{ required: true, message: "Please enter a password" }]}>
+          <Input.Password />
+        </Form.Item>
+        <Button type="primary" htmlType="submit" block>
+          Register
+        </Button>
+      </Form>
+      <p style={{ marginTop: 15 }}>
+        Already have an account? <Link to="/signin">Sign in</Link>
+      </p>
+    </Card>
   );
 }
 

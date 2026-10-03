@@ -1,64 +1,47 @@
-import "./Navbar.css";
-import { useState, useEffect, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useContext } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Layout, Menu } from "antd";
 import { authcontext } from "./AuthContext";
-import React, { Component }  from 'react';
+
+const { Header } = Layout;
 
 export default function Navbar() {
-
   const navigate = useNavigate();
-  const[jwtToken,setJwtToken]=useState(null);
-  const { islogged, setLogStatus } = useContext(authcontext);  
-  
-  const logout = (e) => {
-    e.preventDefault();
-    localStorage.clear();
-    setLogStatus(false);
-    navigate("/");
+  const location = useLocation();
+  const { islogged, setLogStatus } = useContext(authcontext);
+
+  let items = [{ key: "/", label: "Home" }];
+
+  if (islogged) {
+    items.push({ key: "/blogs/new", label: "Create Blog" });
+    items.push({ key: "/user", label: "Update Profile" });
+    items.push({ key: "logout", label: "Logout" });
+  } else {
+    items.push({ key: "/signin", label: "Sign In" });
+    items.push({ key: "/signup", label: "Sign Up" });
   }
 
-  useEffect(() => {
-         
-    let jwtToken =localStorage.getItem('token')||null;
-    console.log(jwtToken);
-    setJwtToken(jwtToken);
-    //window.location.reload();
-           
-  }, [islogged]);
+  const onMenuClick = (e) => {
+    if (e.key === "logout") {
+      localStorage.clear();
+      setLogStatus(false);
+      navigate("/");
+    } else {
+      navigate(e.key);
+    }
+  };
 
   return (
-    <nav className="nav">
-      <p>TECH WORLD WITH HASEB</p>
-      <ul>
-        {
-          (jwtToken!=null)
-          &&
-          (<li><Link to="/logout" onClick={logout}>Logout</Link></li>)
-        }
-        {
-            (jwtToken!=null)
-            &&
-            (<li><Link to="/blogs/new">CreateBlog</Link></li>)
-        }
-        {
-          (jwtToken!=null)
-          &&
-          (<li><Link to="/user">UpdateProfile</Link></li>)
-        }
-        {
-          (jwtToken==null)
-          &&
-          (<li><Link to="/signup">SignUp</Link></li>)
-        }
-        {
-           (jwtToken==null)
-           &&
-           <li><Link to="/signin">SignIn</Link></li>
-        }
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-      </ul>
-    </nav>
+    <Header style={{ display: "flex", alignItems: "center" }}>
+      <div className="logo">TECH WORLD WITH HASEB</div>
+      <Menu
+        theme="dark"
+        mode="horizontal"
+        selectedKeys={[location.pathname]}
+        items={items}
+        onClick={onMenuClick}
+        style={{ flex: 1, minWidth: 0 }}
+      />
+    </Header>
   );
 }

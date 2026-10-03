@@ -1,80 +1,52 @@
-import jwt from 'jwt-decode' ;
-import { useState, useContext, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import "./SignIn.css";
-import { authcontext } from '../Component/AuthContext';
-import React, { Component }  from 'react';
-import axios from 'axios';
+import React, { useContext, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import { Card, Form, Input, Button, message } from "antd";
+import { authcontext } from "../Component/AuthContext";
+import { BASE_URL } from "../../api";
 
 function SignIn() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { islogged , setLogStatus  } = useContext(authcontext);
+  const { setLogStatus } = useContext(authcontext);
 
   useEffect(() => {
-  
-    let jwtToken =localStorage.getItem('token')||null;
-    console.log("In signup "+jwtToken);
-    if(jwtToken!=null) {
+    if (localStorage.getItem("token") != null) {
       navigate("/");
     }
-  },[]);
+  }, []);
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    await axios({
-      method: "post",
-      url: "http://localhost:8080/api/v1/signin",
-      data: {
-        email: email,
-        password: password,
-      },
-    })
-    .then((response) => {
-      const token = response.data;
-      //setToken(token);
-      localStorage.setItem('token', token);
-      console.log(token);
+  const submitHandler = async (values) => {
+    try {
+      const res = await axios.post(BASE_URL + "/signin", values);
+      localStorage.setItem("token", res.data);
       setLogStatus(true);
       navigate("/");
-
-    })
-    .catch((err) => {
-        alert(err.response.data.message);
-    });
+    } catch (err) {
+      message.error(err.response ? err.response.data.message : "Login failed");
+    }
   };
+
   return (
-    <div>
-      <div className="login_box">
-        <form id="form" onSubmit={submitHandler}>
-          <h2 id="heading">Welcome back Anonymous</h2>
-          <input
-            id="username"
-            type="text"
-            name="uname"
-            placeholder="Enter your email"
-            value={email}
-            required
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <br />
-          <input
-            id="pass"
-            type="password"
-            name="pass"
-            placeholder="Enter Your password"
-            value={password}
-            required
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <br />
-          <button id="button1" value="submit" onClick="window.location.reload()">
-            submit
-          </button>
-        </form>
-      </div>
-    </div>
+    <Card title="Welcome back" className="form-box">
+      <Form layout="vertical" onFinish={submitHandler}>
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[{ required: true, type: "email", message: "Please enter a valid email" }]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item label="Password" name="password" rules={[{ required: true, message: "Please enter your password" }]}>
+          <Input.Password />
+        </Form.Item>
+        <Button type="primary" htmlType="submit" block>
+          Sign In
+        </Button>
+      </Form>
+      <p style={{ marginTop: 15 }}>
+        Don't have an account? <Link to="/signup">Sign up</Link>
+      </p>
+    </Card>
   );
 }
 

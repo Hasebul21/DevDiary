@@ -1,22 +1,30 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import "./Card.css";
-function Card(props) {
+import { Card, Button, Typography } from "antd";
+
+const { Paragraph, Text } = Typography;
+
+function StoryCard(props) {
   const navigate = useNavigate();
   const data = props.story;
+
   return (
-    <div className="card">
-      <div className="container">
-        <h3 id="story_id">Id : {data.id}</h3>
-        <h3 id="story_title">Title : {data.title}</h3>
-        <h4 id="story_author">Author : {data.author}</h4>
-        <h4 id="story_date">CreatedDate : {data.createdDate}</h4>
-        <input type="text" id="story_body" maxlength="10" disabled value={data.description}/>
-        <button id="button3"  onClick={() => navigate(`/story/${data.id}`) }>View Details</button>
-      </div>
-    </div>
+    <Card
+      title={data.title}
+      actions={[
+        <Button type="link" onClick={() => navigate(`/story/${data.id}`)}>
+          View Details
+        </Button>,
+      ]}
+    >
+      <Text type="secondary">By {data.author}</Text>
+      <br />
+      <Text type="secondary">{data.createdDate}</Text>
+      <Paragraph ellipsis={{ rows: 3 }} style={{ marginTop: 10 }}>
+        {data.description}
+      </Paragraph>
+    </Card>
   );
 }
 
-
-export default Card;
+export default StoryCard;
