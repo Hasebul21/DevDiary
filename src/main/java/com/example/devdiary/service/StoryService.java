@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -135,6 +136,9 @@ public class StoryService {
         String userEmail= checkAuth.getAuthName();
         Optional<Users> currentUser=userRepository.findByEmail(userEmail);
         story.setAuthorid(currentUser.get());
+        // id 0 means new story, otherwise save() will overwrite the story with that id
+        story.setId(0);
+        story.setCreatedDate(new Date());
         story.setTags(saveTags(story.getTags()));
         storyRepository.save(story);
         return storyDtoConverter.getDetails(story);

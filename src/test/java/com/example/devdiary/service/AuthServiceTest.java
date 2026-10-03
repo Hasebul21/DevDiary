@@ -110,4 +110,17 @@ public class AuthServiceTest {
         Users saved=authService.signUp(userOne);
         Assertions.assertEquals("USER",saved.getRole(),"Role should be USER");
     }
+
+    @Test
+    @DisplayName("Sign Up Ignores Id From Client")
+    void SignUpIgnoresClientId(){
+
+        Users userOne=new Users(2,"haseb@gmail.com","12345","Haseb","01789533586");
+        when(mockUserRepository.findByEmail("haseb@gmail.com")).thenReturn(Optional.empty());
+        when(mockpasswordValidator.isValid("12345")).thenReturn(true);
+        when(mockpasswordEncoder.encode("12345")).thenReturn("12345");
+        when(mockUserRepository.save(userOne)).thenReturn(userOne);
+        authService.signUp(userOne);
+        Assertions.assertEquals(0,userOne.getId(),"Client id should be ignored");
+    }
 }

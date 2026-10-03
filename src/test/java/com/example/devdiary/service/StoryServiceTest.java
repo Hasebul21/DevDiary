@@ -275,4 +275,16 @@ public class StoryServiceTest {
         storyService.updateStory(1,new Storys("New title","New description"));
         Assertions.assertEquals("New title",mockStory.getTitle(),"Admin should update the story");
     }
+
+    @Test
+    @DisplayName("Test Post Story Ignores Id From Client")
+    void postStoryIgnoresClientId(){
+
+        Users mockUser=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        Storys mockStory=new Storys(7, null,"Spring boot","Spring boot is hard.Really!!!!");
+        when(checkAuth.getAuthName()).thenReturn("haseb@gmail.com");
+        when(userRepository.findByEmail("haseb@gmail.com")).thenReturn(Optional.of(mockUser));
+        storyService.postStory(mockStory);
+        Assertions.assertEquals(0,mockStory.getId(),"Client id should be ignored");
+    }
 }
