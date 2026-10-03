@@ -55,7 +55,8 @@ public class SecurityConfiguration {
                 .permitAll()
                 .antMatchers(HttpMethod.GET,apiVersion+"/stories/my")
                 .authenticated()
-                .antMatchers(HttpMethod.GET,apiVersion+"/stories/",apiVersion+"/stories/*")
+                .antMatchers(HttpMethod.GET,apiVersion+"/stories/",apiVersion+"/stories/*",
+                        apiVersion+"/stories/*/comments",apiVersion+"/stories/*/likes")
                 .permitAll()
                 .antMatchers(HttpMethod.GET,apiVersion+"/users/",apiVersion+"/users/*",apiVersion+"/users/*/stories")
                 .permitAll()
