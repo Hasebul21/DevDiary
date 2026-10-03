@@ -19,7 +19,7 @@ function StoryCard(props) {
     >
       <Text type="secondary">By {data.author}</Text>
       <br />
-      <Text type="secondary">{data.createdDate}</Text>
+      <Text type="secondary">{new Date(data.createdDate).toLocaleDateString()}</Text>
       <Paragraph ellipsis={{ rows: 3 }} style={{ marginTop: 10 }}>
         {data.description}
       </Paragraph>
