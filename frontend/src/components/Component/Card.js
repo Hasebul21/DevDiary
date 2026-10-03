@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, Button, Typography } from "antd";
+import { Card, Button, Typography, Tag } from "antd";
 
 const { Paragraph, Text } = Typography;
 
@@ -23,6 +23,12 @@ function StoryCard(props) {
       <Paragraph ellipsis={{ rows: 3 }} style={{ marginTop: 10 }}>
         {data.description}
       </Paragraph>
+      {data.tags &&
+        data.tags.map((tag) => (
+          <Tag key={tag} color="blue" style={{ cursor: "pointer" }} onClick={() => navigate(`/tag/${tag}`)}>
+            #{tag}
+          </Tag>
+        ))}
     </Card>
   );
 }

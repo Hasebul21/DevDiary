@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Card, Form, Input, Button, message } from "antd";
+import { Card, Form, Input, Button, Select, message } from "antd";
 import { BASE_URL, getToken } from "../../api";
 
 function CreateBlog() {
@@ -34,6 +34,9 @@ function CreateBlog() {
         </Form.Item>
         <Form.Item label="Description" name="description" rules={[{ required: true, message: "Please write something" }]}>
           <Input.TextArea rows={8} />
+        </Form.Item>
+        <Form.Item label="Tags" name="tags">
+          <Select mode="tags" placeholder="Type a tag and press enter, for example java" tokenSeparators={[",", " "]} />
         </Form.Item>
         <Button type="primary" htmlType="submit">
           Save
