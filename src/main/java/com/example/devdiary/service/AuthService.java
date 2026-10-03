@@ -39,6 +39,8 @@ public class AuthService {
             user.setPassword(pass);
             // nobody can become admin from signup
             user.setRole("USER");
+            // id 0 means new user, otherwise save() will overwrite the user with that id
+            user.setId(0);
             return userRepository.save(user);
 
         }
