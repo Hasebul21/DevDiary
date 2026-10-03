@@ -1,0 +1,3 @@
+import { createContext } from "react";
+
+export const authcontext = createContext(null);
