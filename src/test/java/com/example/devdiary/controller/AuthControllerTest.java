@@ -81,6 +81,14 @@ public class AuthControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    @DisplayName("POST/signin/guest Success")
+    void loginGuestSuccess() throws Exception {
+        Users guest = new Users(2, "guest@devdiary.com", "secret", "Guest User", "01800000000");
+        when(authService.signInAsGuest()).thenReturn(guest);
+        mockMvc.perform(post("/api/v1/signin/guest")).andExpect(status().isOk());
+    }
+
     public static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);

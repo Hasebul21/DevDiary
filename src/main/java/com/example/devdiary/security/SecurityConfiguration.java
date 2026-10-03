@@ -58,7 +58,7 @@ public class SecurityConfiguration {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers(apiVersion + "/signin", apiVersion + "/signup")
+                .antMatchers(apiVersion + "/signin", apiVersion + "/signin/guest", apiVersion + "/signup")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, apiVersion + "/stories/my", apiVersion + "/users/me")
                 .authenticated()

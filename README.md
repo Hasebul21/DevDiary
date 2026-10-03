@@ -23,6 +23,7 @@ Front-end made using ReactJs.
 
 # Features
 - Sign up / Sign in with JWT
+- Sign in as guest (shared demo account, profile can not be changed)
 - Create, update, delete own stories
 - My stories and stories of any user
 - Pagination (newest story first)
@@ -39,6 +40,7 @@ Base url: `/api/v1`
 |---|---|---|
 | POST | /signup | No |
 | POST | /signin | No |
+| POST | /signin/guest | No |
 | GET | /stories/ | No |
 | GET | /stories/page?pageNo=0&pageSize=6 | No |
 | GET | /stories/search?keyword=spring | No |

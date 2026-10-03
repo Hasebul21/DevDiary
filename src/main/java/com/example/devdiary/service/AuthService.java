@@ -8,11 +8,17 @@ import com.example.devdiary.exception.EntityNotFoundException;
 import com.example.devdiary.exception.InvalidPasswordException;
 import com.example.devdiary.repository.UserRepository;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 public class AuthService {
+
+    public static final String GUEST_EMAIL = "guest@devdiary.com";
+    public static final String GUEST_ROLE = "GUEST";
 
     private final PasswordValidator passwordValidator;
     private final PasswordEncoder passwordEncoder;
@@ -52,5 +58,23 @@ public class AuthService {
             throw new AccessDeniedException("Invalid email or password");
         }
         return existing;
+    }
+
+    public Users signInAsGuest() {
+        return userRepository.findByEmail(GUEST_EMAIL).orElseGet(this::createGuest);
+    }
+
+    private Users createGuest() {
+        Users guest = new Users();
+        guest.setEmail(GUEST_EMAIL);
+        guest.setName("Guest User");
+        guest.setPhone("01800000000");
+        guest.setRole(GUEST_ROLE);
+        guest.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+        try {
+            return userRepository.save(guest);
+        } catch (DataIntegrityViolationException e) {
+            return userRepository.findByEmail(GUEST_EMAIL).orElseThrow(() -> e);
+        }
     }
 }

@@ -33,4 +33,11 @@ public class AuthController {
         String token = authenticate.authenticate(newUser);
         return ResponseEntity.status(HttpStatus.OK).body(token);
     }
+
+    @PostMapping(path = "/signin/guest")
+    public ResponseEntity<?> signInAsGuest() {
+        Users guest = authService.signInAsGuest();
+        String token = authenticate.authenticate(guest);
+        return ResponseEntity.status(HttpStatus.OK).body(token);
+    }
 }
