@@ -71,10 +71,16 @@ function Comments(props) {
             }
           >
             <List.Item.Meta
-              title={<Text strong>{comment.author}</Text>}
-              description={new Date(comment.createdDate).toLocaleString()}
+              title={
+                <span>
+                  <Text strong>{comment.author}</Text>
+                  <Text type="secondary" style={{ marginLeft: 10, fontWeight: "normal", fontSize: 12 }}>
+                    {new Date(comment.createdDate).toLocaleString()}
+                  </Text>
+                </span>
+              }
+              description={<div style={{ whiteSpace: "pre-wrap", color: "rgba(0,0,0,0.88)" }}>{comment.text}</div>}
             />
-            <div style={{ width: "100%", whiteSpace: "pre-wrap" }}>{comment.text}</div>
           </List.Item>
         )}
       />
