@@ -1,7 +1,9 @@
 package com.example.devdiary.service;
 
 
+import com.example.devdiary.Utils.IsValidStory;
 import com.example.devdiary.Utils.IsValidUser;
+import com.example.devdiary.Utils.PasswordValidator;
 import com.example.devdiary.dto.StoryDto;
 import com.example.devdiary.dto.UserDto;
 import com.example.devdiary.dto.UserDtoConverter;
@@ -9,8 +11,10 @@ import com.example.devdiary.entity.Storys;
 import com.example.devdiary.entity.Users;
 import com.example.devdiary.exception.AccessDeniedException;
 import com.example.devdiary.exception.EntityNotFoundException;
+import com.example.devdiary.exception.InvalidPasswordException;
 import com.example.devdiary.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
@@ -28,6 +32,24 @@ public class UserService {
 
     @Autowired
     private UserDtoConverter userDtoConverter;
+
+    @Autowired
+    private IsValidStory authInfo;
+
+    @Autowired
+    private PasswordValidator passwordValidator;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // details of the logged in user
+    public UserDto getMe() {
+
+        String email=authInfo.getAuthName();
+        Optional<Users> user=userRepository.findByEmail(email);
+        if(user.isEmpty()) throw new EntityNotFoundException(Users.class,"email",email);
+        return userDtoConverter.getDetails(user.get());
+    }
 
     public List<UserDto> getAllUser() {
 
@@ -53,8 +75,12 @@ public class UserService {
 
         if(checkAuth.isValid(newUser.get())) {
 
-            newUser.get().setEmail(users.getEmail());
-            newUser.get().setPassword(users.getPassword());
+            // email is used inside the login token, so it can not be changed here
+            // password is changed only when user sends a new one
+            if(users.getPassword()!=null && !users.getPassword().isEmpty()){
+                if(!passwordValidator.isValid(users.getPassword())) throw new InvalidPasswordException();
+                newUser.get().setPassword(passwordEncoder.encode(users.getPassword()));
+            }
             newUser.get().setName(users.getName());
             newUser.get().setPhone(users.getPhone());
             userRepository.save(newUser.get());

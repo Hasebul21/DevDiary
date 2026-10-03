@@ -5,6 +5,7 @@ import com.example.devdiary.dto.UserDto;
 import com.example.devdiary.dto.UserDtoConverter;
 import com.example.devdiary.entity.Users;
 import com.example.devdiary.exception.AccessDeniedException;
+import com.example.devdiary.exception.InvalidPasswordException;
 import com.example.devdiary.exception.EntityNotFoundException;
 import com.example.devdiary.exception.handler.GlobalExceptionHandler;
 import com.example.devdiary.repository.UserRepository;
@@ -74,6 +75,8 @@ public class UserServiceTest {
     void updateSingleUserSucess(){
 
         Users userOne=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        // no new password, so password should not change
+        userOne.setPassword(null);
         Users userTwo=new Users(1,"sakib@gmail.com","abcde","Sakib","01789533586");
         UserDto mockUserDto=new UserDto(1,"sakib@gmail.com","Sakib","01789533586");
         when(userRepository.findById(1)).thenReturn(Optional.of(userTwo));
@@ -117,4 +120,30 @@ public class UserServiceTest {
     }
 
 
+
+    @Test
+    @DisplayName("Update User Keeps Email And Hashes Password")
+    void updateUserPassword(){
+
+        Users oldUser=new Users(1,"haseb@gmail.com","oldhash","Haseb","01789533586");
+        Users newData=new Users(1,"other@gmail.com","NewPass123","Haseb Hassan","01700000000");
+        when(userRepository.findById(1)).thenReturn(Optional.of(oldUser));
+        when(isValidUser.isValid(oldUser)).thenReturn(true);
+        userService.updateUser(1,newData);
+        Assertions.assertEquals("haseb@gmail.com",oldUser.getEmail(),"Email should not change");
+        Assertions.assertEquals("Haseb Hassan",oldUser.getName(),"Name should change");
+        Assertions.assertNotEquals("NewPass123",oldUser.getPassword(),"Password should be hashed");
+        Assertions.assertTrue(oldUser.getPassword().startsWith("$2"),"Password should be bcrypt hash");
+    }
+
+    @Test
+    @DisplayName("Update User With Weak Password")
+    void updateUserWeakPassword(){
+
+        Users oldUser=new Users(1,"haseb@gmail.com","oldhash","Haseb","01789533586");
+        Users newData=new Users(1,"haseb@gmail.com","123","Haseb","01789533586");
+        when(userRepository.findById(1)).thenReturn(Optional.of(oldUser));
+        when(isValidUser.isValid(oldUser)).thenReturn(true);
+        Assertions.assertThrows(InvalidPasswordException.class,()->userService.updateUser(1,newData),"Weak password should fail");
+    }
 }

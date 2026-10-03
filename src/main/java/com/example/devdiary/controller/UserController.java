@@ -39,6 +39,13 @@ public class UserController {
           return ResponseEntity.status(HttpStatus.OK).body(newUsers);
      }
 
+     // details of the logged in user
+     @GetMapping("/me")
+     public ResponseEntity<UserDto> getMe() {
+
+          return ResponseEntity.status(HttpStatus.OK).body(userService.getMe());
+     }
+
      // all stories written by one user
      @GetMapping("/{id}/stories")
      public ResponseEntity<List<StoryDto>> getStoryOfUser(@PathVariable int id) {
