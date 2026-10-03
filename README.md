@@ -28,6 +28,7 @@ Front-end made using ReactJs.
 - Tags on stories and filter stories by tag
 - Comments on stories (only the writer can delete a comment)
 - Like / unlike a story
+- Admin user and dummy data
 
 # API Endpoints
 Base url: `/api/v1`
@@ -60,6 +61,12 @@ Example story body:
 { "title": "Learning Spring", "description": "Spring boot basics", "tags": ["java", "spring"] }
 ```
 
+# Admin and dummy data
+- The admin can edit or delete any story and delete any comment.
+- When the database has no story, the app creates some dummy users, stories, tags, comments and likes.
+- Dummy users (password `Demo1234`): `rahim.uddin@demo.com`, `nusrat.jahan@demo.com`, `tanvir.ahmed@demo.com`,
+  and two parody accounts `elon.tusk@demo.com`, `mark.zuckerbot@demo.com`.
+
 # How to run
 Need Java 17 and MySQL. Create a database named `tech_blog` first.
 
@@ -72,6 +79,10 @@ Environment variables:
 | DB_USERNAME | root | |
 | DB_PASSWORD | empty | |
 | ALLOWED_ORIGINS | http://localhost:3000 | frontend urls, comma separated |
+| ADMIN_EMAIL | empty | admin account is created only when email and password are set |
+| ADMIN_PASSWORD | empty | admin password is reset to this value on every start |
+| ADMIN_NAME | Admin | |
+| SEED_DATA | true | create dummy users, stories, comments and likes when there is no story |
 | PORT | 8080 | |
 
 ```bash

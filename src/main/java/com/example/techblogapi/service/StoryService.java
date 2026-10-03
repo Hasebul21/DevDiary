@@ -144,7 +144,7 @@ public class StoryService {
 
         Optional<Storys> newStory=storyRepository.findById(id);
         if(newStory.isEmpty())  throw new EntityNotFoundException(Storys.class,"id",String.valueOf(id));
-        if(checkAuth.isValid(newStory)){
+        if(checkAuth.isValid(newStory) || checkAuth.isAdmin()){
 
             Storys checkStory=newStory.get();
             checkStory.setTitle(story.getTitle());
@@ -162,7 +162,7 @@ public class StoryService {
 
         Optional<Storys> newStory=storyRepository.findById(id);
         if(newStory.isEmpty()) throw new EntityNotFoundException(Storys.class,"id",String.valueOf(id));
-        if(checkAuth.isValid(newStory)) {
+        if(checkAuth.isValid(newStory) || checkAuth.isAdmin()) {
 
             // first delete comments and likes of this story, otherwise database will not allow to delete the story
             List<Comments> comments=commentRepository.findByStory_IdOrderByIdAsc(id);

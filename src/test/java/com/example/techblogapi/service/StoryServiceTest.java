@@ -262,4 +262,17 @@ public class StoryServiceTest {
         List<StoryDto>found=storyService.getStoryByTag(" Java ");
         Assertions.assertEquals(1,found.size(),"Expected 1 Story");
     }
+
+    @Test
+    @DisplayName("Test Admin Can Update Other User Story")
+    void adminCanUpdateStory(){
+
+        Users mockUser=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        Storys mockStory=new Storys(1, mockUser,"Spring boot","Spring boot is hard.Really!!!!");
+        when(storyRepository.findById(1)).thenReturn(Optional.of(mockStory));
+        when(checkAuth.isValid(Optional.of(mockStory))).thenReturn(false);
+        when(checkAuth.isAdmin()).thenReturn(true);
+        storyService.updateStory(1,new Storys("New title","New description"));
+        Assertions.assertEquals("New title",mockStory.getTitle(),"Admin should update the story");
+    }
 }

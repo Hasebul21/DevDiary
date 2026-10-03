@@ -13,6 +13,7 @@ public class UserDtoConverter {
         userDto.setEmail(user.getEmail());
         userDto.setName(user.getName());
         userDto.setPhone(user.getPhone());
+        userDto.setRole(user.getRole()==null ? "USER" : user.getRole());
         return userDto;
     }
 }

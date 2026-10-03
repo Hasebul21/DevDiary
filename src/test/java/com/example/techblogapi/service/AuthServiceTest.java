@@ -96,4 +96,18 @@ public class AuthServiceTest {
         //when(mockpasswordEncoder.matches("12345","12345")).thenReturn(false);
         Assertions.assertThrows(EntityNotFoundException.class,()->authService.signIn(userOne),"This should throw exception");
     }
+
+    @Test
+    @DisplayName("Sign Up Can Not Make Admin")
+    void SignUpCanNotMakeAdmin(){
+
+        Users userOne=new Users(1,"haseb@gmail.com","12345","Haseb","01789533586");
+        userOne.setRole("ADMIN");
+        when(mockUserRepository.findByEmail("haseb@gmail.com")).thenReturn(Optional.empty());
+        when(mockpasswordValidator.isValid("12345")).thenReturn(true);
+        when(mockpasswordEncoder.encode("12345")).thenReturn("12345");
+        when(mockUserRepository.save(userOne)).thenReturn(userOne);
+        Users saved=authService.signUp(userOne);
+        Assertions.assertEquals("USER",saved.getRole(),"Role should be USER");
+    }
 }
