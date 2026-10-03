@@ -1,3 +1,19 @@
+# Tech World With Haseb - Frontend
+
+React + Ant Design frontend of the tech blog. The backend is in the root of this repository.
+
+```bash
+npm install
+npm start          # http://localhost:3000, uses backend at http://localhost:8080/api/v1
+```
+
+Set `REACT_APP_API_URL` to use another backend, for example
+`REACT_APP_API_URL=https://my-api.onrender.com/api/v1 npm run build`.
+
+Deployed on Vercel with root directory `frontend`. `vercel.json` sends every route to `index.html` so that page refresh works.
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
