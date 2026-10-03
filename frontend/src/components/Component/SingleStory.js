@@ -4,7 +4,7 @@ import axios from "axios";
 import jwt_decode from "jwt-decode";
 import { Card, Form, Input, Button, Popconfirm, Space, Typography, Spin, Select, Tag, message } from "antd";
 import Comments from "./Comments";
-import { BASE_URL, getToken } from "../../api";
+import { BASE_URL, getToken, isAdmin } from "../../api";
 
 const { Text, Title, Paragraph } = Typography;
 
@@ -83,13 +83,15 @@ export default function Story() {
     return <Spin size="large" style={{ display: "block", marginTop: 100 }} />;
   }
 
-  const isMine = user === story.author;
+  // admin can edit and delete every story
+  const isMine = user === story.author || isAdmin();
   const likedByMe = user != null && likes.users.includes(user);
 
   return (
     <div>
       <Card className="story-box">
         <Text strong>Author: </Text> {story.author}
+        {user !== story.author && isMine && <Tag color="red" style={{ marginLeft: 10 }}>Editing as admin</Tag>}
         <br />
         <Text strong>Created: </Text> {new Date(story.createdDate).toLocaleString()}
         <br />
