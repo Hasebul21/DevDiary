@@ -26,6 +26,12 @@ public class StoryController {
         return ResponseEntity.status(HttpStatus.OK).body(storyService.getAllStory());
     }
 
+    // stories of the logged in user
+    @GetMapping("/my")
+    public ResponseEntity<List<StoryDto>> getMyStory() {
+        return ResponseEntity.status(HttpStatus.OK).body(storyService.getMyStory());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getSingleStory(@PathVariable int id) {
 

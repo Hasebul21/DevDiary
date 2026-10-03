@@ -189,6 +189,30 @@ public class StoryControllerTest {
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    @DisplayName("GET/stories/my  Success")
+    void getMyStory() throws Exception{
+
+        StoryDto storyDto=new StoryDto(1,"haseb@gmail.com","Spring","Spring boot is a magic");
+        when(mockStoryService.getMyStory()).thenReturn(Arrays.asList(storyDto));
+
+        mockMvc.perform(get("/api/v1/stories/my"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].author").value("haseb@gmail.com"));
+    }
+
+    @Test
+    @DisplayName("GET/users/1/stories  Success")
+    void getStoryOfUser() throws Exception{
+
+        StoryDto storyDto=new StoryDto(1,"haseb@gmail.com","Spring","Spring boot is a magic");
+        when(mockStoryService.getStoryByUser(1)).thenReturn(Arrays.asList(storyDto));
+
+        mockMvc.perform(get("/api/v1/users/{id}/stories",1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].title").value("Spring"));
+    }
+
     public static String asJsonString(final Object obj) {
         try {
             return new ObjectMapper().writeValueAsString(obj);

@@ -1,8 +1,10 @@
 package com.example.techblogapi.controller;
 
 
+import com.example.techblogapi.dto.StoryDto;
 import com.example.techblogapi.dto.UserDto;
 import com.example.techblogapi.entity.Users;
+import com.example.techblogapi.service.StoryService;
 import com.example.techblogapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,9 @@ public class UserController {
      @Autowired
      private UserService userService;
 
+     @Autowired
+     private StoryService storyService;
+
 
     @GetMapping("/")
      public ResponseEntity<List<UserDto>> getAllUser() {
@@ -32,6 +37,13 @@ public class UserController {
 
           UserDto newUsers =userService.getSingleUser(id);
           return ResponseEntity.status(HttpStatus.OK).body(newUsers);
+     }
+
+     // all stories written by one user
+     @GetMapping("/{id}/stories")
+     public ResponseEntity<List<StoryDto>> getStoryOfUser(@PathVariable int id) {
+
+          return ResponseEntity.status(HttpStatus.OK).body(storyService.getStoryByUser(id));
      }
 
      @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
