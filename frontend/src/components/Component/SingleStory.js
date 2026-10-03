@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
-import { Card, Form, Input, Button, Popconfirm, Space, Typography, Spin, message } from "antd";
+import { Card, Form, Input, Button, Popconfirm, Space, Typography, Spin, Select, message } from "antd";
 import { BASE_URL, getToken } from "../../api";
 
 const { Text } = Typography;
@@ -30,6 +30,7 @@ export default function Story() {
         form.setFieldsValue({
           title: res.data.title,
           description: res.data.description,
+          tags: res.data.tags,
         });
       } catch (err) {
         message.error("Story not found");
@@ -81,6 +82,9 @@ export default function Story() {
         </Form.Item>
         <Form.Item label="Description" name="description" rules={[{ required: true, message: "Description can't be empty" }]}>
           <Input.TextArea rows={8} />
+        </Form.Item>
+        <Form.Item label="Tags" name="tags">
+          <Select mode="tags" placeholder="Type a tag and press enter, for example java" tokenSeparators={[",", " "]} />
         </Form.Item>
 
         {isMine && (

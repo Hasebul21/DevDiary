@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Row, Col, Spin, Empty, Pagination, Input, message } from "antd";
+import { useNavigate } from "react-router-dom";
+import { Row, Col, Spin, Empty, Pagination, Input, Tag, message } from "antd";
 import Card from "../Component/Card";
 import { BASE_URL } from "../../api";
 
@@ -12,6 +13,16 @@ function Blogs() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [keyword, setKeyword] = useState("");
+  const [tags, setTags] = useState([]);
+  const navigate = useNavigate();
+
+  // load all tags one time
+  useEffect(() => {
+    axios
+      .get(BASE_URL + "/tags/")
+      .then((res) => setTags(res.data))
+      .catch((err) => console.log(err));
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,6 +83,15 @@ function Blogs() {
         onSearch={searchHandler}
         style={{ maxWidth: 600, margin: "0 auto 30px", display: "flex" }}
       />
+      {tags.length > 0 && (
+        <div style={{ textAlign: "center", marginBottom: 25 }}>
+          {tags.map((tag) => (
+            <Tag key={tag} color="blue" style={{ cursor: "pointer", marginBottom: 8 }} onClick={() => navigate(`/tag/${tag}`)}>
+              #{tag}
+            </Tag>
+          ))}
+        </div>
+      )}
       {content}
       {!loading && keyword === "" && total > PAGE_SIZE && (
         <Pagination
