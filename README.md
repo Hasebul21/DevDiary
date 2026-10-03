@@ -66,7 +66,9 @@ Example story body:
 # Admin and dummy data
 - The admin can edit or delete any story and delete any comment.
 - When the database has no story, the app creates some dummy users, stories, tags, comments and likes.
+- A second batch of stories about AI (LLMs, RAG, prompt engineering and more) is added one time, also to an existing database.
 - Dummy users (password `Demo1234`): `rahim.uddin@demo.com`, `nusrat.jahan@demo.com`, `tanvir.ahmed@demo.com`,
+  `farhan.kabir@demo.com`, `sadia.islam@demo.com`, `arif.hossain@demo.com`,
   and two parody accounts `elon.tusk@demo.com`, `mark.zuckerbot@demo.com`.
 
 # How to run

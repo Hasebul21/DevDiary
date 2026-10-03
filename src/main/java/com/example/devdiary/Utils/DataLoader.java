@@ -64,6 +64,11 @@ public class DataLoader implements CommandLineRunner {
         if(seedData && storyRepository.count()==0){
             createDummyData(admin);
         }
+        // second batch of dummy data about AI, added later
+        // runs only one time, when the first AI user is not in the database
+        if(seedData && userRepository.findByEmail("farhan.kabir@demo.com").isEmpty()){
+            createAiData(admin);
+        }
     }
 
     // admin email and password come from environment variable
@@ -223,6 +228,107 @@ public class DataLoader implements CommandLineRunner {
         createLike(tanvir,s8);
 
         System.out.println("Dummy data is created");
+    }
+
+    private void createAiData(Users admin) {
+
+        Users farhan=createUser("farhan.kabir@demo.com","Farhan Kabir","01766666666");
+        Users sadia=createUser("sadia.islam@demo.com","Sadia Islam","01777777777");
+        Users arif=createUser("arif.hossain@demo.com","Arif Hossain","01788888888");
+        Users rahim=createUser("rahim.uddin@demo.com","Rahim Uddin","01711111111");
+        Users nusrat=createUser("nusrat.jahan@demo.com","Nusrat Jahan","01722222222");
+        Users tanvir=createUser("tanvir.ahmed@demo.com","Tanvir Ahmed","01733333333");
+        Users tusk=createUser("elon.tusk@demo.com","Elon Tusk","01744444444");
+        Users zuckerbot=createUser("mark.zuckerbot@demo.com","Mark Zuckerbot","01755555555");
+        if(admin==null) admin=farhan;
+
+        Storys a1=createStory(farhan,"What is a Large Language Model, in simple words",
+                "A Large Language Model (LLM) is a neural network trained on a huge amount of text. "
+                        + "During training it learns one simple task: guess the next word (more exactly, the next token). "
+                        + "Because it has seen so much text, it becomes very good at this, and that is enough to answer questions, "
+                        + "summarize articles, translate and even write code.\n\n"
+                        + "Important to remember: an LLM does not look things up like a search engine. "
+                        + "It generates text that sounds right, so you should always check important facts.",
+                new String[]{"ai","llm"},5);
+
+        Storys a2=createStory(sadia,"Prompt engineering tips that actually work",
+                "After using chatbots at work for a few months, these are the tips that helped me the most:\n\n"
+                        + "1. Give context: say who the answer is for and why you need it.\n"
+                        + "2. Show an example of the output you want.\n"
+                        + "3. Ask for a specific format, like a table or a bullet list.\n"
+                        + "4. Break a big task into small steps.\n"
+                        + "5. If the answer is wrong, tell the model what is wrong instead of starting again.",
+                new String[]{"ai","prompt-engineering"},4);
+
+        Storys a3=createStory(arif,"RAG: let a chatbot answer from your own documents",
+                "RAG means Retrieval Augmented Generation. The idea is simple:\n\n"
+                        + "1. Split your documents into small chunks.\n"
+                        + "2. Turn every chunk into an embedding (a list of numbers) and save it in a vector database.\n"
+                        + "3. When a user asks a question, find the chunks that are most similar to the question.\n"
+                        + "4. Send those chunks to the LLM together with the question.\n\n"
+                        + "Now the model answers from your data instead of only from what it learned in training, "
+                        + "and you can show the source of every answer.",
+                new String[]{"ai","llm","rag"},3);
+
+        Storys a4=createStory(nusrat,"AI hallucinations and why they happen",
+                "Sometimes an AI model gives an answer that sounds very confident but is completely made up. "
+                        + "This is called a hallucination. It happens because the model predicts likely text, "
+                        + "it does not know what is true.\n\n"
+                        + "How to reduce it: give the model the real data (for example with RAG), ask it to say \"I don't know\" "
+                        + "when it is not sure, and always verify names, numbers and links before you use them.",
+                new String[]{"ai","ethics"},2);
+
+        Storys a5=createStory(tanvir,"Using AI coding assistants without losing your skills",
+                "AI assistants can write boilerplate, tests and SQL queries in seconds. I use them every day, "
+                        + "but I follow three rules:\n\n"
+                        + "1. Read and understand every line before I commit it.\n"
+                        + "2. Write the hard logic myself first, then ask the AI to review it.\n"
+                        + "3. Never paste passwords, API keys or customer data into a chatbot.\n\n"
+                        + "Used like this, it makes me faster without making me lazy.",
+                new String[]{"ai","tools","security"},1);
+
+        Storys a6=createStory(admin,"AI vs Machine Learning vs Deep Learning",
+                "People use these words like they mean the same thing, but they are not the same:\n\n"
+                        + "AI - the big idea of making computers do tasks that need human intelligence.\n"
+                        + "Machine Learning - a part of AI where the computer learns patterns from data instead of following fixed rules.\n"
+                        + "Deep Learning - a part of machine learning that uses neural networks with many layers. "
+                        + "Image recognition and LLMs are built with deep learning.",
+                new String[]{"ai","machine-learning"},0);
+
+        createComment(sadia,a1,"Best simple explanation of LLMs I have read.");
+        createComment(rahim,a1,"So it is basically very smart autocomplete?");
+        createComment(farhan,a1,"Yes, very very smart autocomplete. That is a good way to think about it.");
+        createComment(zuckerbot,a1,"As a fellow human, I also predict the next word. Beep.");
+        createComment(arif,a2,"Tip number 5 saves me a lot of time.");
+        createComment(tanvir,a2,"Giving an example output works like magic.");
+        createComment(nusrat,a3,"Which vector database do you use?");
+        createComment(arif,a3,"For small projects even PostgreSQL with pgvector is enough.");
+        createComment(farhan,a4,"Always check the links! I got a fake documentation link once.");
+        createComment(tusk,a4,"My rocket never hallucinates. It only explodes sometimes.");
+        createComment(sadia,a5,"Rule number 3 is so important. Companies have leaked data like this.");
+        createComment(rahim,a5,"I use it for writing unit tests, it helps a lot.");
+        createComment(nusrat,a6,"The circle diagram finally makes sense now.");
+
+        createLike(sadia,a1);
+        createLike(arif,a1);
+        createLike(rahim,a1);
+        createLike(tanvir,a1);
+        createLike(farhan,a2);
+        createLike(nusrat,a2);
+        createLike(tanvir,a2);
+        createLike(farhan,a3);
+        createLike(sadia,a3);
+        createLike(nusrat,a3);
+        createLike(arif,a4);
+        createLike(sadia,a4);
+        createLike(farhan,a5);
+        createLike(arif,a5);
+        createLike(nusrat,a5);
+        createLike(sadia,a6);
+        createLike(tanvir,a6);
+        createLike(zuckerbot,a6);
+
+        System.out.println("AI dummy data is created");
     }
 
     private Users createUser(String email, String name, String phone) {
